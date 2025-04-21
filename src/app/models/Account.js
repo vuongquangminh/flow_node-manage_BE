@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { SECRET_ACCESS_TOKEN } = require("../config/index");
 
 const Schema = mongoose.Schema;
 
@@ -34,5 +36,14 @@ AccountSchema.pre("save", function (next) {
     });
   });
 });
+
+AccountSchema.methods.generateAccessJWT = function () {
+  let payload = {
+    id: this._id,
+  };
+  return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
+    expiresIn: '20m',
+  });
+};
 
 module.exports = mongoose.model("Account", AccountSchema);
