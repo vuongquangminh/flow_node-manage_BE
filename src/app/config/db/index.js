@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
+const { URI } = require("../../config/index");
 
 async function connect() {
   try {
-    await mongoose.connect("mongodb://localhost:27017/flow_node_manage", {
+    await mongoose.connect(URI, {
       // useNewUrlParser: true,
       // useUnifiedTopology: true,
       // useCreateIndex: true

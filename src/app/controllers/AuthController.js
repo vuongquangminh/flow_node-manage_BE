@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 
 const Account = require("../models/Account");
-
 class AuthController {
   //POST: /login
   async login(req, res, next) {
@@ -10,37 +9,22 @@ class AuthController {
 
     !query && res.status(404).json({ error: "Không tìm thấy tài khoản" });
 
-    bcrypt.compare(dataReq.password, query.password, (err, result) => {
-      if (err) {
-        // Handle error
-        res.status(500).json({ error: "Hệ thống đang bị lỗi" });
-      }
+    const isPasswordValid = bcrypt.compareSync(
+      dataReq.password,
+      query.password
+    );
+    isPasswordValid
+      ? res.json({ message: "Đăng nhập thành công!" })
+      : res.status(401).json({ error: "Mật khẩu không đúng" });
 
-      if (result) {
-        // Passwords match, authentication successful
-        res.json({ message: "Đăng nhập thành công!" });
-      } else {
-        // Passwords don't match, authentication failed
-        res.status(404).json({ error: "Mật khẩu không đúng" });
-      }
-    });
   }
 
   // POST: create account to login
   async create(req, res, next) {
+      const { name, email, password } = req.body;
     try {
-      const userPassword = "user_password"; // Replace with the actual password
-      bcrypt.hash(userPassword, 1, (err, hash) => {
-        if (err) {
-          // Handle error
-          res.status(404).json({ error: "lỗi" });
-        }
-
-        // Hashing successful, 'hash' contains the hashed password
-        res.send(hash);
-      });
-      //   const data = await Account.create(req.body);
-      //   res.json({ data, message: "Tạo tài khoản thành công" });
+      const data = await Account.create(req.body);
+      res.json({ data, message: "Tạo tài khoản thành công" });
     } catch (error) {
       throw error;
     }
