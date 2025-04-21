@@ -40,9 +40,10 @@ AccountSchema.pre("save", function (next) {
 AccountSchema.methods.generateAccessJWT = function () {
   let payload = {
     id: this._id,
+    email: this.email,
   };
   return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
-    expiresIn: '20m',
+    expiresIn: "20m",
   });
 };
 

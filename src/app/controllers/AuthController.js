@@ -12,9 +12,12 @@ class AuthController {
       dataReq.password,
       query.password
     );
-    isPasswordValid
-      ? res.json({ message: "Đăng nhập thành công!" })
-      : res.status(401).json({ error: "Mật khẩu không đúng" });
+    if (isPasswordValid) {
+      const token = query.generateAccessJWT();
+      return res.json({ token, message: "Đăng nhập thành công!" });
+    } else {
+    }
+    return res.status(401).json({ error: "Mật khẩu không đúng" });
   }
 
   // POST: create account to login
