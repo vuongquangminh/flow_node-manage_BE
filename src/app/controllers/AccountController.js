@@ -1,4 +1,4 @@
-// const Account = require("../models/Account");
+const Account = require("../models/Account");
 
 class AccountController {
   //GET: account
