@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app = express();
 const port = 3000;
@@ -6,13 +5,16 @@ const port = 3000;
 // Middleware to parse JSON
 app.use(express.json());
 
+// app.use(express.json()); // for parsing application/json
+// app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
 const db = require("./app/config/db");
+const routeApp = require("./app/routes");
+
 db.connect();
 
 // Basic route
-app.get("/", (req, res) => {
-  res.json({ message: "Hello World11!" });
-});
+routeApp(app);
 
 // Start the server
 app.listen(port, () => {
