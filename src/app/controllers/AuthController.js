@@ -6,7 +6,9 @@ class AuthController {
     const dataReq = req.body;
     const query = await Account.findOne({ email: dataReq.email });
 
-    !query && res.status(404).json({ error: "Không tìm thấy tài khoản" });
+    if (!query) {
+      return res.status(404).json({ error: "Không tìm thấy tài khoản" });
+    }
 
     const isPasswordValid = bcrypt.compareSync(
       dataReq.password,

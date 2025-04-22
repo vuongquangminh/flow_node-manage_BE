@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { SECRET_ACCESS_TOKEN } = require("../config");
 
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Lấy token từ header: Bearer <token>
@@ -7,7 +8,7 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Giải mã token
+    const decoded = jwt.verify(token, SECRET_ACCESS_TOKEN); // Giải mã token
     req.user = decoded; // Gán thông tin người dùng vào req để dùng ở các route tiếp theo
     next();
   } catch (error) {
