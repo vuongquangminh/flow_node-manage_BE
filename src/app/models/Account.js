@@ -43,7 +43,7 @@ AccountSchema.methods.generateAccessJWT = function () {
     email: this.email,
   };
   return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
-    expiresIn: "20m",
+    expiresIn: "220m",
   });
 };
 
