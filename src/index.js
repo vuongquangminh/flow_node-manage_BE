@@ -20,40 +20,44 @@ const io = new Server(server, {
 
 // Khi client kết nối socket
 io.on("connection", (socket) => {
-
   // Gửi một node mẫu từ server khi client connect
-  // socket.on("change-flow", async (data) => {
-  //   try {
-  //     console.log('data: ',data)
-  //     const query = await Flow.find({_id: data._id})
-  //     // Giả sử bạn nhận data từ client, và data có _id và các trường khác cần cập nhật
-  //     const updatedData = await Flow.findOneAndUpdate({ _id: data._id }, data, {
-  //       new: true,
-  //     });
-  //     if (updatedData) {
-  //       // Gửi lại dữ liệu đã được cập nhật đến tất cả các client khác qua socket
-  //       socket.broadcast.emit("flow-updated", updatedData);
+  socket.on("change-flow", async (data) => {
+    try {
+      console.log("data: ", data);
+      // const query = await Flow.find({ _id: data._id });
+      // console.log("query: ", query);
+      
+      const updatedData = await Account.findOneAndUpdate({ name: data.name }, {email: data.email}, {
+        new: true,
+      });
+      console.log('updatedData: ',updatedData)
+      if (updatedData) {
+        socket.broadcast.emit("flow-updated", updatedData);
+      }
+      // if (updatedData) {
+      //   // Gửi lại dữ liệu đã được cập nhật đến tất cả các client khác qua socket
+      //   socket.broadcast.emit("flow-updated", updatedData);
 
-  //       // Thông báo thành công cho client gửi sự kiện
-  //       socket.emit("flow-update-success", {
-  //         data: updatedData,
-  //         message: "Bạn đã cập nhật dữ liệu flow thành công",
-  //       });
-  //     } else {
-  //       // Nếu không tìm thấy dữ liệu để cập nhật
-  //       socket.emit("flow-update-error", { message: "Dữ liệu không tồn tại" });
-  //     }
-  //   } catch (error) {
-  //     console.error("Lỗi khi cập nhật flow:", error);
-  //     socket.emit("flow-update-error", {
-  //       message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
-  //     });
-  //   }
-  // });
+      //   // Thông báo thành công cho client gửi sự kiện
+      //   socket.emit("flow-update-success", {
+      //     data: updatedData,
+      //     message: "Bạn đã cập nhật dữ liệu flow thành công",
+      //   });
+      // } else {
+      //   // Nếu không tìm thấy dữ liệu để cập nhật
+      //   socket.emit("flow-update-error", { message: "Dữ liệu không tồn tại" });
+      // }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật flow:", error);
+      socket.emit("flow-update-error", {
+        message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
+      });
+    }
+  });
 
-  // socket.on("disconnect", () => {
-  //   console.log("User disconnected", socket.id);
-  // });
+  socket.on("disconnect", () => {
+    console.log("User disconnected", socket.id);
+  });
 });
 
 // Middleware cấu hình cho Express
@@ -71,6 +75,7 @@ app.use((req, res, next) => {
 // Kết nối DB và khai báo routes
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
+const Account = require("./app/models/Account");
 
 db.connect();
 routeApp(app);
