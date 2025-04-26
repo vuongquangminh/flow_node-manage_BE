@@ -24,13 +24,15 @@ io.on("connection", (socket) => {
   socket.on("change-flow", async (data) => {
     try {
       console.log("data: ", data);
-      // const query = await Flow.find({ _id: data._id });
-      // console.log("query: ", query);
-      
-      const updatedData = await Account.findOneAndUpdate({ name: data.name }, {email: data.email}, {
-        new: true,
-      });
-      console.log('updatedData: ',updatedData)
+
+      const updatedData = await Account.findOneAndUpdate(
+        { name: data.name },
+        { email: data.email },
+        {
+          new: true,
+        }
+      );
+      console.log("updatedData: ", updatedData);
       if (updatedData) {
         socket.broadcast.emit("flow-updated", updatedData);
       }
