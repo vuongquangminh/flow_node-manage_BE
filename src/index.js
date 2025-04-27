@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
-
 const app = express();
 const port = require("./app/config/index");
+const Account = require("./app/models/Account");
+const Chat = require("./app/models/Chat");
 
 // Tạo server HTTP từ app
 const server = http.createServer(app);
@@ -61,8 +62,6 @@ app.use((req, res, next) => {
 // Kết nối DB và khai báo routes
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
-const Account = require("./app/models/Account");
-const Chat = require("./app/models/Chat");
 
 db.connect();
 routeApp(app);
