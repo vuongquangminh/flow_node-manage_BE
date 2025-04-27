@@ -1,4 +1,4 @@
-const Flow = require("../models/Flow");
+const Flow = require("../models/Chat");
 
 class FlowController {
   //GET: account

@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
-const Flow = require("./app/models/Flow");
 
 const app = express();
 const port = require("./app/config/index");
@@ -21,36 +20,21 @@ const io = new Server(server, {
 // Khi client kết nối socket
 io.on("connection", (socket) => {
   // Gửi một node mẫu từ server khi client connect
-  socket.on("change-flow", async (data) => {
+  socket.on("sent-message", async (data) => {
     try {
       console.log("data: ", data);
 
-      const updatedData = await Account.findOneAndUpdate(
+      const createMessage = await Chat.create(
         { name: data.name },
-        { email: data.email },
-        {
-          new: true,
-        }
+        { message: data.message }
       );
-      console.log("updatedData: ", updatedData);
-      if (updatedData) {
-        socket.broadcast.emit("flow-updated", updatedData);
-      }
-      // if (updatedData) {
-      //   // Gửi lại dữ liệu đã được cập nhật đến tất cả các client khác qua socket
-      //   socket.broadcast.emit("flow-updated", updatedData);
 
-      //   // Thông báo thành công cho client gửi sự kiện
-      //   socket.emit("flow-update-success", {
-      //     data: updatedData,
-      //     message: "Bạn đã cập nhật dữ liệu flow thành công",
-      //   });
-      // } else {
-      //   // Nếu không tìm thấy dữ liệu để cập nhật
-      //   socket.emit("flow-update-error", { message: "Dữ liệu không tồn tại" });
-      // }
+      console.log("createMessage: ", createMessage);
+      if (createMessage) {
+        socket.broadcast.emit("conversation-updated", createMessage);
+      }
     } catch (error) {
-      console.error("Lỗi khi cập nhật flow:", error);
+      console.error("Lỗi khi cập nhật message:", error);
       socket.emit("flow-update-error", {
         message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
       });
@@ -78,6 +62,7 @@ app.use((req, res, next) => {
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
 const Account = require("./app/models/Account");
+const Chat = require("./app/models/Chat");
 
 db.connect();
 routeApp(app);
