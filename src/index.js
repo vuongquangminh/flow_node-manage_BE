@@ -31,9 +31,10 @@ io.on("connection", (socket) => {
       });
 
       console.log("createMessage: ", createMessage);
-      if (createMessage) {
-        socket.broadcast.emit("conversation-updated", createMessage);
-      }
+      socket.broadcast.emit("conversation-updated", createMessage);
+      console.log("Sent conversation-updated to clients");
+
+      
     } catch (error) {
       console.error("Lỗi khi cập nhật message:", error);
       socket.emit("flow-update-error", {
