@@ -24,10 +24,10 @@ io.on("connection", (socket) => {
     try {
       console.log("data: ", data);
 
-      const createMessage = await Chat.create(
-        { name: data.name },
-        { message: data.message }
-      );
+      const createMessage = await Chat.create({
+        name: data.name,
+        message: data.message,
+      });
 
       console.log("createMessage: ", createMessage);
       if (createMessage) {
@@ -41,9 +41,9 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected", socket.id);
-  });
+  // socket.on("disconnect", () => {
+  //   console.log("User disconnected", socket.id);
+  // });
 });
 
 // Middleware cấu hình cho Express
