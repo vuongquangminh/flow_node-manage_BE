@@ -8,7 +8,11 @@ class AccountController {
   }
 
   async getById(req, res, next) {
-    const query = await Account.findOne({ name: req.params.id });
+    const query = await Account.findOne({ _id: req.params.id });
+    res.json(query);
+  }
+  async create(req, res, next) {
+    const query = await Account.create(req.body);
     res.json(query);
   }
 }

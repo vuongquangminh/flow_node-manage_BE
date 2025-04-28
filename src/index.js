@@ -10,6 +10,28 @@ const Chat = require("./app/models/Chat");
 // Tạo server HTTP từ app
 const server = http.createServer(app);
 
+// Middleware cấu hình cho Express
+app.use(cors());
+app.disable("x-powered-by");
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+// Gắn io vào req để có thể emit từ các controller
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
+// Kết nối DB và khai báo routes
+const db = require("./app/config/db");
+const routeApp = require("./app/routes");
+
+db.connect();
+routeApp(app);
+
+
+
+
 // Khởi tạo socket.io
 const io = new Server(server, {
   cors: {
@@ -48,24 +70,7 @@ io.on("connection", (socket) => {
   // });
 });
 
-// Middleware cấu hình cho Express
-app.use(cors());
-app.disable("x-powered-by");
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 
-// Gắn io vào req để có thể emit từ các controller
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
-
-// Kết nối DB và khai báo routes
-const db = require("./app/config/db");
-const routeApp = require("./app/routes");
-
-db.connect();
-routeApp(app);
 
 // Bắt đầu server chung
 server.listen(port.port, () => {

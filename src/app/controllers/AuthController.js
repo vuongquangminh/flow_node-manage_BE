@@ -16,7 +16,7 @@ class AuthController {
     );
     if (isPasswordValid) {
       const token = query.generateAccessJWT();
-      return res.json({ token, message: "Đăng nhập thành công!" });
+      return res.json({ user: query, token, message: "Đăng nhập thành công!" });
     } else {
     }
     return res.status(401).json({ error: "Mật khẩu không đúng" });

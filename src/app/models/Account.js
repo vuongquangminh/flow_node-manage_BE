@@ -4,22 +4,30 @@ const jwt = require("jsonwebtoken");
 const { SECRET_ACCESS_TOKEN } = require("../config/index");
 
 const Schema = mongoose.Schema;
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
-const AccountSchema = new Schema({
-  name: { type: String, required: "Tên của bạn là bắt buộc", maxLength: 255 },
-  email: {
-    type: String,
-    required: "Email của bạn là bắt buộc",
-    maxLength: 255,
+const AccountSchema = new Schema(
+  {
+    _id: Number,
+    name: { type: String, required: "Tên của bạn là bắt buộc", maxLength: 255 },
+    email: {
+      type: String,
+      required: "Email của bạn là bắt buộc",
+      maxLength: 255,
+    },
+    password: {
+      type: String,
+      required: "Mật khẩu của bạn là bắt buộc",
+      maxLength: 600,
+    },
+    status: {
+      type: Boolean,
+    },
+    createAt: { type: Date, default: Date.now },
+    upDateAt: { type: Date, default: Date.now },
   },
-  password: {
-    type: String,
-    required: "Mật khẩu của bạn là bắt buộc",
-    maxLength: 600,
-  },
-  createAt: { type: Date, default: Date.now },
-  upDateAt: { type: Date, default: Date.now },
-});
+  { _id: false }
+);
 
 AccountSchema.pre("save", function (next) {
   const user = this;
@@ -39,12 +47,15 @@ AccountSchema.pre("save", function (next) {
 
 AccountSchema.methods.generateAccessJWT = function () {
   let payload = {
-    id: this._id,
+    // id: this._id,
     email: this.email,
+    password: this.password,
   };
   return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
     expiresIn: "220m",
   });
 };
+
+AccountSchema.plugin(AutoIncrement, { id: "account_id_counter" });
 
 module.exports = mongoose.model("Account", AccountSchema);

@@ -6,7 +6,10 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const ChatSchema = new Schema(
   {
     _id: Number,
-    name: String,
+    name_sent: String,
+    sender_id: String,
+    name_receiver: String,
+    receiver_id: String,
     message: String,
     createAt: { type: Date, default: Date.now },
     upDateAt: { type: Date, default: Date.now },
@@ -14,6 +17,6 @@ const ChatSchema = new Schema(
   { _id: false }
 );
 
-ChatSchema.plugin(AutoIncrement);
+ChatSchema.plugin(AutoIncrement, { id: "chat_id_counter" });
 
 module.exports = mongoose.model("Chat", ChatSchema);
