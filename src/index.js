@@ -29,9 +29,6 @@ const routeApp = require("./app/routes");
 db.connect();
 routeApp(app);
 
-
-
-
 // Khởi tạo socket.io
 const io = new Server(server, {
   cors: {
@@ -48,15 +45,16 @@ io.on("connection", (socket) => {
       console.log("data: ", data);
 
       const createMessage = await Chat.create({
-        name: data.name,
+        name_sent: data.name_sent,
+        sender_id: data.sender_id,
+        receiver_id: data.receiver_id,
+        name_receiver: data.name_receiver,
         message: data.message,
       });
 
       console.log("createMessage: ", createMessage);
-      socket.broadcast.emit("conversation-updated", createMessage);
+      io.emit("conversation-updated", createMessage);
       console.log("Sent conversation-updated to clients");
-
-      
     } catch (error) {
       console.error("Lỗi khi cập nhật message:", error);
       socket.emit("flow-update-error", {
@@ -69,8 +67,6 @@ io.on("connection", (socket) => {
   //   console.log("User disconnected", socket.id);
   // });
 });
-
-
 
 // Bắt đầu server chung
 server.listen(port.port, () => {
