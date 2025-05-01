@@ -3,7 +3,8 @@ const Account = require("../models/Account");
 class AccountController {
   //GET: account
   async get(req, res, next) {
-    const query = await Account.find({});
+    console.log(typeof req.user.id);
+    const query = await Account.find({ _id: { $ne: req.user.id } });
     res.json(query);
   }
 
