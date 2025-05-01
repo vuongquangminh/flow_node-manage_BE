@@ -4,9 +4,15 @@ class ChatController {
   //GET: message
   async get(req, res, next) {
     console.log(req.query.sender_id);
-    const query = await Chat.find(req.query)
+    const query = await Chat.find({
+      $or: [
+        {sender_id: req.user.id},
+        {receiver_id: req.user.id},
+      ]
+    })
       .sort({ createAt: "desc" })
-      .limit(10);
+      .limit(10)
+      .sort({ createAt: "asc" });
     res.json(query);
   }
   async post(req, res, next) {
