@@ -5,10 +5,14 @@ class ChatController {
   async get(req, res, next) {
     console.log(req.query.sender_id);
     const query = await Chat.find({
-      $or: [{ sender_id: req.user.id }, { receiver_id: req.user.id }],
-      $or: [
-        { sender_id: req.query.receiver_id },
-        { receiver_id: req.query.receiver_id },
+      $and: [
+        { $or: [{ sender_id: req.user.id }, { receiver_id: req.user.id }] },
+        {
+          $or: [
+            { sender_id: req.query.receiver_id },
+            { receiver_id: req.query.receiver_id },
+          ],
+        },
       ],
     })
       .sort({ createAt: "desc" })
