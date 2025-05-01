@@ -1,6 +1,6 @@
 const authRoute = require("./auth");
 const accountRoute = require("./account");
-const flowRoute = require("./flow");
+const flowRoute = require("./chat");
 const authMiddleware = require("../middleware/authMiddleware");
 const AccountController = require("../controllers/AccountController");
 

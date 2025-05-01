@@ -1,10 +1,12 @@
 const Chat = require("../models/Chat");
 
 class ChatController {
-  //GET: account
+  //GET: message
   async get(req, res, next) {
-    console.log(req.query._id);
-    const query = await Chat.findOne({ _id: req.query._id });
+    console.log(req.query.sender_id);
+    const query = await Chat.find(req.query)
+      .sort({ createAt: "desc" })
+      .limit(10);
     res.json(query);
   }
   async post(req, res, next) {
