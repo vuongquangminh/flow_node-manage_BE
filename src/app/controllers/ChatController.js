@@ -16,9 +16,8 @@ class ChatController {
       ],
     })
       .sort({ createAt: "desc" })
-      .limit(10)
-      .sort({ createAt: "asc" });
-    res.json(query);
+      .limit(10);
+    res.json(query.reverse());
   }
   async post(req, res, next) {
     const data = await Chat.create(req.body);
