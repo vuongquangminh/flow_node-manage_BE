@@ -2,6 +2,20 @@ const Account = require("../models/Account");
 const Friend = require("../models/Friend");
 
 class FriendController {
+  async index(req, res, next) {
+    const query = await Friend.find({
+      $or: [
+        {
+          id_user_1: req.user.id,
+        },
+        {
+          id_user_2: req.user.id,
+        },
+      ],
+    });
+    return res.json(query);
+  }
+
   async create(req, res, next) {
     const query = await Friend.findOne({
       $or: [
@@ -18,6 +32,7 @@ class FriendController {
     if (query) {
       return res.json({ message: "Đã kết bạn!" });
     }
+
     const checkExit = await Account.findOne({
       _id: req.body.id_other_person,
       email: req.body.email_other_person,

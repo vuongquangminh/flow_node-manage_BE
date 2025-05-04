@@ -42,7 +42,6 @@ io.on("connection", (socket) => {
   // Gửi một node mẫu từ server khi client connect
   socket.on("sent-message", async (data) => {
     try {
-      console.log("data: ", data);
 
       const createMessage = await Chat.create({
         name_sent: data.name_sent,
@@ -52,9 +51,7 @@ io.on("connection", (socket) => {
         message: data.message,
       });
 
-      console.log("createMessage: ", createMessage);
       io.emit("conversation-updated", createMessage);
-      console.log("Sent conversation-updated to clients");
     } catch (error) {
       console.error("Lỗi khi cập nhật message:", error);
       socket.emit("flow-update-error", {

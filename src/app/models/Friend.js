@@ -7,7 +7,7 @@ const FriendSchema = new Schema(
   {
     _id: Number,
     id_user_1: {
-      type: String,
+      type: Number,
     },
     email_user_1: {
       type: String,
@@ -16,8 +16,8 @@ const FriendSchema = new Schema(
       type: String,
     },
     id_user_2: {
-      type: String,
-      required: "Email user 2 là bắt buộc",
+      type: Number,
+      required: "id user 2 là bắt buộc",
       maxLength: 255,
     },
     email_user_2: {

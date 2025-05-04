@@ -3,7 +3,6 @@ const Chat = require("../models/Chat");
 class ChatController {
   //GET: message
   async get(req, res, next) {
-    console.log(req.query.sender_id);
     const query = await Chat.find({
       $and: [
         { $or: [{ sender_id: req.user.id }, { receiver_id: req.user.id }] },
