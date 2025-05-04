@@ -25,6 +25,7 @@ app.use((req, res, next) => {
 // Kết nối DB và khai báo routes
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
+const Friend = require("./app/models/Friend");
 
 db.connect();
 routeApp(app);
@@ -40,9 +41,11 @@ const io = new Server(server, {
 // Khi client kết nối socket
 io.on("connection", (socket) => {
   // Gửi một node mẫu từ server khi client connect
+  const user = socket.handshake.query.user;
+  socket.user = JSON.parse(user); // gán vào socket
+
   socket.on("sent-message", async (data) => {
     try {
-
       const createMessage = await Chat.create({
         name_sent: data.name_sent,
         sender_id: data.sender_id,
@@ -57,6 +60,41 @@ io.on("connection", (socket) => {
       socket.emit("flow-update-error", {
         message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
       });
+    }
+  });
+
+  socket.on("add-friend", async (data) => {
+    const query = await Friend.findOne({
+      $or: [
+        {
+          id_user_1: socket.user._id,
+          id_user_2: data.id,
+        },
+        {
+          id_user_1: data.id,
+          id_user_2: socket.user._id,
+        },
+      ],
+    });
+    if (query) {
+      return;
+    }
+
+    const checkExit = await Account.findOne({
+      _id: data.id,
+    });
+    if (checkExit) {
+      const new_record = await Friend.create({
+        id_user_1: socket.user._id,
+        email_user_1: socket.user.email,
+        name_user_1: socket.user.name,
+        id_user_2: checkExit._id,
+        email_user_2: checkExit.email,
+        name_user_2: checkExit.name,
+      });
+      io.emit("update-friend", new_record);
+    } else {
+      return;
     }
   });
 
