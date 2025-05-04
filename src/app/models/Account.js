@@ -9,7 +9,7 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const AccountSchema = new Schema(
   {
     _id: Number,
-    name: { type: String, required: "Tên của bạn là bắt buộc", maxLength: 255 },
+    name: { type: String, required: "Tên của bạn là bắt buộc" },
     email: {
       type: String,
       required: "Email của bạn là bắt buộc",
@@ -19,6 +19,9 @@ const AccountSchema = new Schema(
       type: String,
       required: "Mật khẩu của bạn là bắt buộc",
       maxLength: 600,
+    },
+    friend: {
+      type: Number,
     },
     status: {
       type: Boolean,

@@ -13,7 +13,7 @@ const server = http.createServer(app);
 // Middleware cấu hình cho Express
 app.use(cors());
 app.disable("x-powered-by");
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Gắn io vào req để có thể emit từ các controller
