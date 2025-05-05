@@ -67,12 +67,12 @@ io.on("connection", (socket) => {
     const query = await Friend.findOne({
       $or: [
         {
-          id_user_1: socket.user._id,
+          id_user_1: String(socket.user._id),
           id_user_2: data.id,
         },
         {
           id_user_1: data.id,
-          id_user_2: socket.user._id,
+          id_user_2: String(socket.user._id),
         },
       ],
     });
