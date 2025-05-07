@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const { chatSocket } = require("./chat");
 const express = require("express");
+const { chatBot } = require("../chatbot");
 const app = express();
 
 const socketConfig = (server) => {
@@ -9,7 +10,7 @@ const socketConfig = (server) => {
     req.io = io;
     next();
   });
-  
+
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:5173", // Cho phép frontend React truy cập
@@ -22,7 +23,7 @@ const socketConfig = (server) => {
     socket.user = JSON.parse(user); // gán vào socket
 
     chatSocket(io, socket);
-
+    chatBot(io, socket);
     // socket.on("disconnect", () => {
     //   console.log("User disconnected", socket.id);
     // });

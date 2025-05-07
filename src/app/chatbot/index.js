@@ -1,17 +1,20 @@
-import OpenAI from "openai";
+const { completion } = require("../helpers/chatbot");
 
-const openai = new OpenAI({
-  apiKey: "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",
-});
+const chatBot = (io, socket) => {
+  socket.on("user-send-chatbot", async (data) => {
+    console.log("data: ", data);
+    try {
+      completion({ content: data }).then((result) => {
+        console.log("result: ", result);
+        socket.emit("ai-response", result);
+      });
+    } catch (error) {
+      console.error("Lỗi khi cập nhật message:", error);
+      socket.emit("flow-update-error", {
+        message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
+      });
+    }
+  });
+};
 
-const completion = openai.chat.completions.create({
-  model: "gpt-4o-mini",
-  store: true,
-  messages: [
-    {"role": "user", "content": "write a haiku about ai"},
-  ],
-});
-
-completion.then((result) => console.log(result.choices[0].message));
-
-module.exports = {}
+module.exports = { chatBot };
