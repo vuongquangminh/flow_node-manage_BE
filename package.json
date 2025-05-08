@@ -4,7 +4,7 @@
     "dev": "nodemon src/index.js"
   },
   "dependencies": {
-    "@langchain/core": "^0.3.53",
+    "@langchain/core": "^0.3.55",
     "@langchain/openai": "^0.5.10",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",

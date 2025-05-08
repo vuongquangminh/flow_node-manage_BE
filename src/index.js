@@ -8,7 +8,7 @@ const port = require("./app/config/index");
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
 const { socketConfig } = require("./app/sockets");
-const { completion } = require("./app/helpers/chatbot");
+const { langChainBot } = require("./app/chatbot/langChainBot");
 
 // Tạo server HTTP từ app
 const server = http.createServer(app);
@@ -24,7 +24,7 @@ routeApp(app);
 //socket
 socketConfig(server);
 
-
+// langChainBot()
 
 // Bắt đầu server chung
 server.listen(port.port, () => {
