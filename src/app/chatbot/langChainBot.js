@@ -18,7 +18,7 @@ const langChainBot = async () => {
       days,
     };
   }
-  
+
   function get_forecast_weather({ location, days }) {
     // Gọi API thật đến dịch vụ thời tiết (ví dụ OpenWeatherMap)
     // hoặc giả lập data nếu đang test
@@ -31,7 +31,7 @@ const langChainBot = async () => {
   }
 
   const res = await modelForFunctionCalling.invoke(
-    [new HumanMessage("What is the weather in New York?")],
+    [new HumanMessage("Dự báo thời tiết ở Mỹ trong tuần này")],
     {
       functions: [
         {

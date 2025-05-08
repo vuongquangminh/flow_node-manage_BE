@@ -24,7 +24,7 @@ routeApp(app);
 //socket
 socketConfig(server);
 
-// langChainBot()
+// langChainBot();
 
 // Bắt đầu server chung
 server.listen(port.port, () => {
