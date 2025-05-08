@@ -3,7 +3,7 @@ const { HumanMessage } = require("@langchain/core/messages");
 
 const langChainBot = async () => {
   const modelForFunctionCalling = new ChatOpenAI({
-    model: "gpt-4",
+    model: "gpt-3.5-turbo",
     temperature: 0,
     apiKey:
       "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", // In Node.js defaults to process.env.OPENAI_API_KEY

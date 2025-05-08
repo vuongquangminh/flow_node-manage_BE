@@ -12,7 +12,7 @@ const completion = async ({ content }) => {
   console.log("conversationHistory: ", conversationHistory);
   // Gửi yêu cầu đến OpenAI để nhận phản hồi
   const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-3.5-turbo",
     store: true,
     messages: conversationHistory, // Truyền toàn bộ lịch sử cuộc trò chuyện
   });
