@@ -2,13 +2,15 @@ const { ChatOpenAI } = require("@langchain/openai");
 const { HumanMessage } = require("@langchain/core/messages");
 const { z } = require("zod");
 const { tool } = require("@langchain/core/tools");
+const { getContextVariable } = require("@langchain/core/context");
 
-const langChainBot = async () => {
-  const modelForFunctionCalling = new ChatOpenAI({
-    model: "gpt-3.5-turbo",
-    temperature: 0,
-  });
+const modelForFunctionCalling = new ChatOpenAI({
+  model: "gpt-3.5-turbo",
+  temperature: 0,
+  cache: true,
+});
 
+const langChainBot = async ({ content }) => {
   const adderSchema = z.object({
     a: z.number(),
     b: z.number(),
@@ -33,6 +35,13 @@ const langChainBot = async () => {
 
   const multiplyTool = tool(
     async (input) => {
+      const userId = getContextVariable("userId");
+      //validate Error
+      if (userId === undefined) {
+        console.log(
+          `No "userId" found in current context. Remember to call "setContextVariable('userId', value)";`
+        );
+      }
       const multiple = input.a * input.b;
       return `The multiple of ${input.a} and ${input.b} is ${multiple}`;
     },
@@ -47,7 +56,7 @@ const langChainBot = async () => {
 
   const res = await modelForFunctionCalling
     .bindTools(tools)
-    .invoke([new HumanMessage("What is 3 * 12? Also, what is 11 + 49?")]);
+    .invoke([new HumanMessage(content)]);
 
   const toolsByName = {
     addTool: addTool,
@@ -58,10 +67,52 @@ const langChainBot = async () => {
   for (const toolCall of res.tool_calls) {
     const selectedTool = toolsByName[toolCall.name];
     const toolMessage = await selectedTool.invoke(toolCall.args);
-    console.log(('toolMessage: ', toolMessage))
+    console.log(("toolMessage: ", toolMessage));
     messages.push(toolMessage);
   }
-  console.log("Tool results:", messages);
+  console.log("Tool results:", res);
+  return res;
 };
 
-module.exports = { langChainBot };
+// Tavily is a search engine built specifically for AI agents (LLMs), delivering real-time, accurate, and factual results at speed
+require("cheerio");
+const { TavilySearch } = require("@langchain/tavily");
+
+const tavilySearchRealtime = async ({ content }) => {
+  const search = new TavilySearch({
+    maxResults: 2,
+    topic: "general",
+  });
+  const result = await search.invoke({
+    query: content,
+  });
+
+  const articles = result.results?.map((item) => item.content).join("\n\n");
+
+  console.log("articles: ", articles);
+
+  const dataLlmsOutput = await modelForFunctionCalling.invoke([
+    new HumanMessage(`Hãy tóm tắt lại các thông tin này cho tôi : ${articles}`),
+  ]);
+  return dataLlmsOutput.content;
+};
+
+// traning bot
+const { TextLoader } = require("langchain/document_loaders/fs/text");
+const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
+
+const traningBot = async () => {
+  // 1. Load file .txt
+  const loader = new TextLoader("./src/dataTrain/test.txt");
+  const docs = await loader.load();
+
+  // 2. Tách văn bản thành các đoạn nhỏ
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 1000,
+    chunkOverlap: 200,
+  });
+
+  console.log("docs: ", docs);
+};
+
+module.exports = { langChainBot, tavilySearchRealtime, traningBot };
