@@ -30,7 +30,7 @@ socketConfig(server);
 
 // langChainBot();
 // tavilySearchRealtime();
-traningBot()
+// traningBot()
 
 
 // Bắt đầu server chung

@@ -106,7 +106,7 @@ const {
 } = require("@langchain/community/document_loaders/web/cheerio");
 const { RetrievalQAChain } = require("langchain/chains");
 
-const traningBot = async () => {
+const traningBot = async ({ content }) => {
   // 1. Load file .txt
   const pTagSelector = "p";
   const loader = new CheerioWebBaseLoader(
@@ -143,10 +143,10 @@ const traningBot = async () => {
   // 5. Tìm đoạn phù hợp với truy vấn
 
   const response = await chain.invoke({
-    query: "Nói về mục Dùng Cluster để tận dụng đa nhân CPU",
+    query: content,
   });
 
-  console.log("Trả lời LLM:", response);
+  return response.text;
 };
 
 module.exports = { langChainBot, tavilySearchRealtime, traningBot };
