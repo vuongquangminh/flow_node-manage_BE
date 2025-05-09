@@ -1,4 +1,4 @@
-const { ChatOpenAI } = require("@langchain/openai");
+const { ChatOpenAI, OpenAIEmbeddings } = require("@langchain/openai");
 const { HumanMessage } = require("@langchain/core/messages");
 const { z } = require("zod");
 const { tool } = require("@langchain/core/tools");
@@ -100,10 +100,21 @@ const tavilySearchRealtime = async ({ content }) => {
 // traning bot
 const { TextLoader } = require("langchain/document_loaders/fs/text");
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
+const { MemoryVectorStore } = require("langchain/vectorstores/memory");
+const {
+  CheerioWebBaseLoader,
+} = require("@langchain/community/document_loaders/web/cheerio");
+const { RetrievalQAChain } = require("langchain/chains");
 
 const traningBot = async () => {
   // 1. Load file .txt
-  const loader = new TextLoader("./src/dataTrain/test.txt");
+  const pTagSelector = "p";
+  const loader = new CheerioWebBaseLoader(
+    "https://viblo.asia/p/top-5-cach-scale-nodejs-app-ma-ban-can-biet-oK9Vyg7XJQR",
+    {
+      selector: pTagSelector,
+    }
+  );
   const docs = await loader.load();
 
   // 2. Tách văn bản thành các đoạn nhỏ
@@ -112,7 +123,30 @@ const traningBot = async () => {
     chunkOverlap: 200,
   });
 
-  console.log("docs: ", docs);
+  const documents = await splitter.splitDocuments(docs);
+
+  // console.log("documents: ", documents);
+
+  // 3. Biến thành vector và lưu vào MemoryVectorStore
+  const vectorStore = await MemoryVectorStore.fromDocuments(
+    documents,
+    new OpenAIEmbeddings()
+  );
+
+  // 4. Biến thành retriever để truy vấn
+  const retriever = vectorStore.asRetriever({
+    k: 2, // chỉ lấy 2 đoạn giống nhất
+  });
+  // Nhúng RAG (retriever + llm)
+  const chain = RetrievalQAChain.fromLLM(modelForFunctionCalling, retriever);
+
+  // 5. Tìm đoạn phù hợp với truy vấn
+
+  const response = await chain.invoke({
+    query: "Nói về mục Dùng Cluster để tận dụng đa nhân CPU",
+  });
+
+  console.log("Trả lời LLM:", response);
 };
 
 module.exports = { langChainBot, tavilySearchRealtime, traningBot };
