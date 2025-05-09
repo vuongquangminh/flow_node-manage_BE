@@ -106,7 +106,7 @@ const {
 } = require("@langchain/community/document_loaders/web/cheerio");
 const { RetrievalQAChain } = require("langchain/chains");
 
-const traningBot = async ({ content }) => {
+const trainingBot = async ({ content }) => {
   // 1. Load file .txt
   const pTagSelector = "p";
   const loader = new CheerioWebBaseLoader(
@@ -149,4 +149,4 @@ const traningBot = async ({ content }) => {
   return response.text;
 };
 
-module.exports = { langChainBot, tavilySearchRealtime, traningBot };
+module.exports = { langChainBot, tavilySearchRealtime, trainingBot };
