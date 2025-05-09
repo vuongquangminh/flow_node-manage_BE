@@ -56,5 +56,6 @@ const chatSocket = (io, socket) => {
       return;
     }
   });
+
 };
 module.exports = { chatSocket };
