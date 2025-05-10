@@ -10,7 +10,14 @@ const modelForFunctionCalling = new ChatOpenAI({
   cache: true,
 });
 
-const langChainBot = async ({ content }) => {
+const chatgpt = async ({ content }) => {
+  const messages = await modelForFunctionCalling.invoke([
+    new HumanMessage(content),
+  ]);
+
+  return messages.content;
+};
+const chatTool = async ({ content }) => {
   const adderSchema = z.object({
     a: z.number(),
     b: z.number(),
@@ -67,11 +74,11 @@ const langChainBot = async ({ content }) => {
   for (const toolCall of res.tool_calls) {
     const selectedTool = toolsByName[toolCall.name];
     const toolMessage = await selectedTool.invoke(toolCall.args);
-    console.log(("toolMessage: ", toolMessage));
+    console.log("toolMessage: ", toolMessage);
     messages.push(toolMessage);
   }
-  console.log("Tool results:", res);
-  return res;
+  console.log("messages:", messages);
+  return messages;
 };
 
 // Tavily is a search engine built specifically for AI agents (LLMs), delivering real-time, accurate, and factual results at speed
@@ -149,4 +156,4 @@ const trainingBot = async ({ content }) => {
   return response.text;
 };
 
-module.exports = { langChainBot, tavilySearchRealtime, trainingBot };
+module.exports = { chatgpt, chatTool, tavilySearchRealtime, trainingBot };

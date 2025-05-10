@@ -1,13 +1,25 @@
-const { langChainBot, tavilySearchRealtime } = require("./langChainBot");
-
+const { tavilySearchRealtime, chatgpt, chatTool } = require("./langChainBot");
 
 const chatBot = (io, socket) => {
+  socket.on("user-send-chatTool", async (data) => {
+    try {
+      chatTool({ content: data }).then((result) => {
+        console.log("result: ", result);
+        socket.emit("chatTool-response", result.join("/n"));
+      });
+    } catch (error) {
+      console.error("Lỗi khi cập nhật message:", error);
+      socket.emit("flow-update-error", {
+        message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
+      });
+    }
+  });
   socket.on("user-send-chatbot", async (data) => {
     console.log("data: ", data);
     try {
-      langChainBot({ content: data }).then((result) => {
+      chatgpt({ content: data }).then((result) => {
         console.log("result: ", result);
-        socket.emit("ai-response", result);
+        socket.emit("chatbot-response", result);
       });
     } catch (error) {
       console.error("Lỗi khi cập nhật message:", error);
@@ -29,7 +41,7 @@ const chatBot = (io, socket) => {
         message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
       });
     }
-  })
+  });
 };
 
 module.exports = { chatBot };
