@@ -219,6 +219,7 @@ const chatHistory = async () => {
     { messages: [inputMessage] },
     config
   )) {
+    console.log("event: ", event);
     const lastMessage = event.messages[event.messages.length - 1];
     console.log(lastMessage.content);
   }
