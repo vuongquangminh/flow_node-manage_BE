@@ -4,16 +4,14 @@ const { z } = require("zod");
 const { tool } = require("@langchain/core/tools");
 const { getContextVariable } = require("@langchain/core/context");
 
-const modelForFunctionCalling = new ChatOpenAI({
+const model = new ChatOpenAI({
   model: "gpt-3.5-turbo",
   temperature: 0,
   cache: true,
 });
 
 const chatgpt = async ({ content }) => {
-  const messages = await modelForFunctionCalling.invoke([
-    new HumanMessage(content),
-  ]);
+  const messages = await model.invoke([new HumanMessage(content)]);
 
   return messages.content;
 };
@@ -61,9 +59,7 @@ const chatTool = async ({ content }) => {
 
   const tools = [addTool, multiplyTool];
 
-  const res = await modelForFunctionCalling
-    .bindTools(tools)
-    .invoke([new HumanMessage(content)]);
+  const res = await model.bindTools(tools).invoke([new HumanMessage(content)]);
 
   const toolsByName = {
     addTool: addTool,
@@ -98,7 +94,7 @@ const tavilySearchRealtime = async ({ content }) => {
 
   console.log("articles: ", articles);
 
-  const dataLlmsOutput = await modelForFunctionCalling.invoke([
+  const dataLlmsOutput = await model.invoke([
     new HumanMessage(`Hãy tóm tắt lại các thông tin này cho tôi : ${articles}`),
   ]);
   return dataLlmsOutput.content;
@@ -145,7 +141,7 @@ const trainingBot = async ({ content }) => {
     k: 2, // chỉ lấy 2 đoạn giống nhất
   });
   // Nhúng RAG (retriever + llm)
-  const chain = RetrievalQAChain.fromLLM(modelForFunctionCalling, retriever);
+  const chain = RetrievalQAChain.fromLLM(model, retriever);
 
   // 5. Tìm đoạn phù hợp với truy vấn
 
@@ -156,4 +152,93 @@ const trainingBot = async ({ content }) => {
   return response.text;
 };
 
-module.exports = { chatgpt, chatTool, tavilySearchRealtime, trainingBot };
+// Chat Hisstory
+const {
+  StateGraph,
+  MessagesAnnotation,
+  END,
+  START,
+} = require("@langchain/langgraph");
+const { RunnableConfig } = require("@langchain/core/runnables");
+const { v4 } = require("uuid");
+const { InMemoryChatMessageHistory } = require("@langchain/core/chat_history");
+
+const chatHistory = async () => {
+  const chatsBySessionId = {};
+
+  const getChatHistory = (sessionId) => {
+    let chatHistory = chatsBySessionId[sessionId];
+    if (!chatHistory) {
+      chatHistory = new InMemoryChatMessageHistory();
+      chatsBySessionId[sessionId] = chatHistory;
+    }
+    return chatHistory;
+  };
+  // Define the function that calls the model
+  const callModel = async (state, config) => {
+    // console.log("config: ", config);
+    if (!config.configurable?.sessionId) {
+      throw new Error(
+        "Make sure that the config includes the following information: {'configurable': {'sessionId': 'some_value'}}"
+      );
+    }
+
+    const chatHistory = getChatHistory(config.configurable.sessionId);
+    console.log("chatHistory: ", chatHistory);
+
+    let messages = [...(await chatHistory.getMessages()), ...state.messages];
+
+    if (state.messages.length === 1) {
+      // First message, ensure it's in the chat history
+      await chatHistory.addMessage(state.messages[0]);
+    }
+
+    const aiMessage = await model.invoke(messages);
+
+    // Update the chat history
+    await chatHistory.addMessage(aiMessage);
+
+    return { messages: [aiMessage] };
+  };
+
+  // Define a new graph
+  const workflow = new StateGraph(MessagesAnnotation)
+    .addNode("model", callModel)
+    .addEdge(START, "model")
+    .addEdge("model", END);
+
+  const app = workflow.compile();
+
+  // Create a unique session ID to identify the conversation
+  const sessionId = v4();
+  const config = { configurable: { sessionId }, streamMode: "values" };
+
+  const inputMessage = new HumanMessage("hi! I'm bob");
+
+  for await (const event of await app.stream(
+    { messages: [inputMessage] },
+    config
+  )) {
+    const lastMessage = event.messages[event.messages.length - 1];
+    console.log(lastMessage.content);
+  }
+
+  // Here, let's confirm that the AI remembers our name!
+  const followUpMessage = new HumanMessage("what was my name?");
+
+  for await (const event of await app.stream(
+    { messages: [followUpMessage] },
+    config
+  )) {
+    const lastMessage = event.messages[event.messages.length - 1];
+    console.log(lastMessage.content);
+  }
+};
+
+module.exports = {
+  chatgpt,
+  chatTool,
+  tavilySearchRealtime,
+  trainingBot,
+  chatHistory,
+};

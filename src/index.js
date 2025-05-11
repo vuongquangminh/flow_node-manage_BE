@@ -12,6 +12,7 @@ const {
   langChainBot,
   tavilySearchRealtime,
   traniingBot,
+  chatHistory,
 } = require("./app/chatbot/langChainBot");
 
 // Tạo server HTTP từ app
@@ -31,7 +32,7 @@ socketConfig(server);
 // langChainBot();
 // tavilySearchRealtime();
 // trainingBot()
-
+chatHistory()
 
 // Bắt đầu server chung
 server.listen(port.port, () => {
