@@ -32,7 +32,7 @@ socketConfig(server);
 // langChainBot();
 // tavilySearchRealtime();
 // trainingBot()
-chatHistory()
+// chatHistory()
 
 // Bắt đầu server chung
 server.listen(port.port, () => {

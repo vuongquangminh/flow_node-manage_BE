@@ -10,10 +10,61 @@ const model = new ChatOpenAI({
   cache: true,
 });
 
-const chatgpt = async ({ content }) => {
-  const messages = await model.invoke([new HumanMessage(content)]);
+const chatsBySessionId = {};
+const chatgpt = async ({ message, sessionId, config }) => {
+  console.log(message, sessionId, config);
 
-  return messages.content;
+  const getChatHistory = (sessionId) => {
+    let chatHistory = chatsBySessionId[sessionId];
+    if (!chatHistory) {
+      chatHistory = new InMemoryChatMessageHistory();
+      chatsBySessionId[sessionId] = chatHistory;
+    }
+    return chatHistory;
+  };
+
+  let lastAIMessage = null;
+
+  const callModel = async (state, config) => {
+    if (!config.configurable?.sessionId) {
+      throw new Error(
+        "Make sure that the config includes the following information: {'configurable': {'sessionId': 'some_value'}}"
+      );
+    }
+
+    const chatHistory = getChatHistory(config.configurable.sessionId);
+
+    console.log("chatHistory: ", chatHistory);
+    let messages = [...(await chatHistory.getMessages()), ...state.messages];
+
+    if (state.messages.length === 1) {
+      // First message, ensure it's in the chat history
+      await chatHistory.addMessage(state.messages[0]);
+    }
+
+    const aiMessage = await model.invoke(messages);
+
+    // Update the chat history
+    await chatHistory.addMessage(aiMessage);
+    lastAIMessage = aiMessage; // Lưu lại để return ra ngoài
+    return { messages: [aiMessage] };
+  };
+  // Define a new graph
+  const workflow = new StateGraph(MessagesAnnotation)
+    .addNode("model", callModel)
+    .addEdge(START, "model")
+    .addEdge("model", END);
+
+  const app = workflow.compile();
+
+  for await (const event of await app.stream({ messages: [message] }, config)) {
+    const lastMessage = event.messages[event.messages.length - 1];
+    console.log(lastMessage.content);
+  }
+
+  // const messages = await model.invoke([new HumanMessage(content)]);
+
+  return lastAIMessage?.content; // ✅ Trả ra nội dung phản hồi từ AI
 };
 const chatTool = async ({ content }) => {
   const adderSchema = z.object({

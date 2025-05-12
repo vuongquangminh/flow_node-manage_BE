@@ -15,9 +15,12 @@ const chatBot = (io, socket) => {
     }
   });
   socket.on("user-send-chatbot", async (data) => {
-    console.log("data: ", data);
     try {
-      chatgpt({ content: data }).then((result) => {
+      chatgpt({
+        message: data.message,
+        sessionId: data.sessionId,
+        config: data.config,
+      }).then((result) => {
         console.log("result: ", result);
         socket.emit("chatbot-response", result);
       });
