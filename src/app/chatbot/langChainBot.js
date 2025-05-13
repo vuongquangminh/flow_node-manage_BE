@@ -13,7 +13,6 @@ const model = new ChatOpenAI({
 const chatsBySessionId = {};
 
 const chatgpt = async ({ message, sessionId, config }) => {
-
   const getChatHistory = (sessionId) => {
     let chatHistory = chatsBySessionId[sessionId];
     if (!chatHistory) {
@@ -160,7 +159,7 @@ const {
 } = require("@langchain/community/document_loaders/web/cheerio");
 const { RetrievalQAChain } = require("langchain/chains");
 
-const EmbeddingBot = async ({ content }) => {
+const embeddingBot = async ({ content }) => {
   // 1. Load file .txt
   const pTagSelector = "p";
   const loader = new CheerioWebBaseLoader(
@@ -199,6 +198,7 @@ const EmbeddingBot = async ({ content }) => {
   const response = await chain.invoke({
     query: content,
   });
+  console.log("response: ", response);
 
   return response.text;
 };
@@ -291,6 +291,6 @@ module.exports = {
   chatgpt,
   chatTool,
   tavilySearchRealtime,
-  EmbeddingBot,
+  embeddingBot,
   chatHistory,
 };

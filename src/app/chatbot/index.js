@@ -1,4 +1,9 @@
-const { tavilySearchRealtime, chatgpt, chatTool } = require("./langChainBot");
+const {
+  tavilySearchRealtime,
+  chatgpt,
+  chatTool,
+  embeddingBot,
+} = require("./langChainBot");
 
 const chatBot = (io, socket) => {
   socket.on("user-send-chatTool", async (data) => {
@@ -46,9 +51,8 @@ const chatBot = (io, socket) => {
     }
   });
   socket.on("user-send-chat-embedding", async (data) => {
-    console.log("data: ", data);
     try {
-      EmbeddingBot({ content: data }).then((result) => {
+      embeddingBot({ content: data }).then((result) => {
         console.log("result: ", result);
         socket.emit("chat-embedding-response", result);
       });
