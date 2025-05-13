@@ -1,5 +1,5 @@
 const { ChatOpenAI, OpenAIEmbeddings } = require("@langchain/openai");
-const { HumanMessage } = require("@langchain/core/messages");
+const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const { z } = require("zod");
 const { tool } = require("@langchain/core/tools");
 const { getContextVariable } = require("@langchain/core/context");
@@ -10,60 +10,17 @@ const model = new ChatOpenAI({
   cache: true,
 });
 
-const chatsBySessionId = {};
-
-const chatgpt = async ({ message, sessionId, config }) => {
-  const getChatHistory = (sessionId) => {
-    let chatHistory = chatsBySessionId[sessionId];
-    if (!chatHistory) {
-      chatHistory = new InMemoryChatMessageHistory();
-      chatsBySessionId[sessionId] = chatHistory;
-    }
-    return chatHistory;
-  };
-
-  let lastAIMessage = null;
-
-  const callModel = async (state, config) => {
-    if (!config.configurable?.sessionId) {
-      throw new Error(
-        "Make sure that the config includes the following information: {'configurable': {'sessionId': 'some_value'}}"
-      );
-    }
-
-    const chatHistory = getChatHistory(config.configurable.sessionId);
-
-    console.log("chatHistory: ", chatHistory);
-    let messages = [...(await chatHistory.getMessages()), ...state.messages];
-
-    if (state.messages.length === 1) {
-      // First message, ensure it's in the chat history
-      await chatHistory.addMessage(state.messages[0]);
-    }
-
-    const aiMessage = await model.invoke(messages);
-
-    // Update the chat history
-    await chatHistory.addMessage(aiMessage);
-    lastAIMessage = aiMessage; // Lưu lại để return ra ngoài
-    return { messages: [aiMessage] };
-  };
-  // Define a new graph
-  const workflow = new StateGraph(MessagesAnnotation)
-    .addNode("model", callModel)
-    .addEdge(START, "model")
-    .addEdge("model", END);
-
-  const app = workflow.compile();
-
-  for await (const event of await app.stream({ messages: [message] }, config)) {
-    const lastMessage = event.messages[event.messages.length - 1];
-    console.log(lastMessage.content);
-  }
-
-  // const messages = await model.invoke([new HumanMessage(content)]);
-
-  return lastAIMessage?.content; // ✅ Trả ra nội dung phản hồi từ AI
+const chatgpt = async ({ content, message, sessionId, config }) => {
+  const historyMessages = [
+    new HumanMessage("có mấy mục chính trong bài viết"),
+    new AIMessage(
+      "Bài viết có 7 mục chính, bao gồm:\n\n1. Giới thiệu\n2. Cách tính điểm và Bảng xếp hạng\n3. Giải thưởng BXH và Thành tựu đặc biệt\n4. Hãy đăng ký một tài khoản Viblo để nhận được nhiều bài viết thú vị hơn.\n5. Đăng nhập\n6. Đăng kí\n7. Thông tin"
+    ),
+    new HumanMessage(content), // câu mới bạn đang hỏi
+  ];
+  const response = await model.invoke(historyMessages);
+  console.log("AI trả lời:", response.content);
+  return response.content;
 };
 const chatTool = async ({ content }) => {
   const adderSchema = z.object({
@@ -157,49 +114,35 @@ const { MemoryVectorStore } = require("langchain/vectorstores/memory");
 const {
   CheerioWebBaseLoader,
 } = require("@langchain/community/document_loaders/web/cheerio");
-const { RetrievalQAChain } = require("langchain/chains");
 
 const embeddingBot = async ({ content }) => {
-  // 1. Load file .txt
-  const pTagSelector = "p";
   const loader = new CheerioWebBaseLoader(
-    "https://viblo.asia/p/top-5-cach-scale-nodejs-app-ma-ban-can-biet-oK9Vyg7XJQR",
-    {
-      selector: pTagSelector,
-    }
+    "https://viblo.asia/announcements/chinh-thuc-cong-bo-the-le-chi-tiet-su-kien-viblo-mayfest-2025-decoding-a-decade-BQyJKvRQ4Me"
   );
   const docs = await loader.load();
-
-  // 2. Tách văn bản thành các đoạn nhỏ
-  const splitter = new RecursiveCharacterTextSplitter({
+  const textSplitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1000,
     chunkOverlap: 200,
   });
-
-  const documents = await splitter.splitDocuments(docs);
-
-  // console.log("documents: ", documents);
-
-  // 3. Biến thành vector và lưu vào MemoryVectorStore
+  const splits = await textSplitter.splitDocuments(docs);
   const vectorStore = await MemoryVectorStore.fromDocuments(
-    documents,
+    splits,
     new OpenAIEmbeddings()
   );
-
-  // 4. Biến thành retriever để truy vấn
-  const retriever = vectorStore.asRetriever({
-    k: 2, // chỉ lấy 2 đoạn giống nhất
-  });
-  // Nhúng RAG (retriever + llm)
-  const chain = RetrievalQAChain.fromLLM(model, retriever);
-
-  // 5. Tìm đoạn phù hợp với truy vấn
-
+  // Retrieve and generate using the relevant snippets of the blog.
+  const retriever = vectorStore.asRetriever();
+  //Tạo 1 chain và có lưu lịch sử trò chuyện
+  const chain = ConversationalRetrievalQAChain.fromLLM(model, retriever);
+  // 6. Người dùng chat nhiều lượt
   const response = await chain.invoke({
-    query: content,
+    question: content,
+    chat_history: chatHistory,
   });
-  console.log("response: ", response);
 
+  // Cập nhật lịch sử chat
+  chatHistory.push([content, response.text]);
+  console.log("Q2:", response.text);
+  console.log("chatHistory: ", chatHistory);
   return response.text;
 };
 
@@ -210,9 +153,9 @@ const {
   END,
   START,
 } = require("@langchain/langgraph");
-const { RunnableConfig } = require("@langchain/core/runnables");
 const { v4 } = require("uuid");
 const { InMemoryChatMessageHistory } = require("@langchain/core/chat_history");
+const { ConversationalRetrievalQAChain } = require("langchain/chains");
 
 const chatHistory = async () => {
   const chatsBySessionId = {};

@@ -1,3 +1,4 @@
+const { aiAgent } = require("./agent");
 const {
   tavilySearchRealtime,
   chatgpt,
@@ -22,9 +23,7 @@ const chatBot = (io, socket) => {
   socket.on("user-send-chatbot", async (data) => {
     try {
       chatgpt({
-        message: data.message,
-        sessionId: data.sessionId,
-        config: data.config,
+        content: data.message,
       }).then((result) => {
         console.log("result: ", result);
         socket.emit("chatbot-response", result);

@@ -13,7 +13,9 @@ const {
   tavilySearchRealtime,
   traniingBot,
   chatHistory,
+  chatgpt,
 } = require("./app/chatbot/langChainBot");
+const { aiAgent } = require("./app/chatbot/agent");
 
 // Tạo server HTTP từ app
 const server = http.createServer(app);
@@ -33,6 +35,8 @@ socketConfig(server);
 // tavilySearchRealtime();
 // trainingBot()
 // chatHistory()
+// aiAgent({content: "Tôi tên là Minh"})
+// chatgpt({ content: "Tôi vừa hỏi gì" });
 
 // Bắt đầu server chung
 server.listen(port.port, () => {

@@ -1,0 +1,47 @@
+const {
+  CheerioWebBaseLoader,
+} = require("@langchain/community/document_loaders/web/cheerio");
+const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
+const { MemoryVectorStore } = require("langchain/vectorstores/memory");
+const { OpenAIEmbeddings, ChatOpenAI } = require("@langchain/openai");
+const { ConversationalRetrievalQAChain } = require("langchain/chains");
+
+const model = new ChatOpenAI({
+  model: "gpt-3.5-turbo",
+  temperature: 0,
+  cache: true,
+});
+
+let chatHistory = [];
+const aiAgent = async ({ content }) => {
+  const loader = new CheerioWebBaseLoader(
+    "https://viblo.asia/announcements/chinh-thuc-cong-bo-the-le-chi-tiet-su-kien-viblo-mayfest-2025-decoding-a-decade-BQyJKvRQ4Me"
+  );
+  const docs = await loader.load();
+  const textSplitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 1000,
+    chunkOverlap: 200,
+  });
+  const splits = await textSplitter.splitDocuments(docs);
+  const vectorStore = await MemoryVectorStore.fromDocuments(
+    splits,
+    new OpenAIEmbeddings()
+  );
+  // Retrieve and generate using the relevant snippets of the blog.
+  const retriever = vectorStore.asRetriever();
+  //Tạo 1 chain và có lưu lịch sử trò chuyện
+  const chain = ConversationalRetrievalQAChain.fromLLM(model, retriever);
+  // 6. Người dùng chat nhiều lượt
+  const res1 = await chain.invoke({
+    question: content,
+    chat_history: chatHistory,
+  });
+
+  // Cập nhật lịch sử chat
+  chatHistory.push([content, res1.text]);
+  console.log("Q2:", res1.text);
+  console.log("chatHistory: ", chatHistory);
+  return res1.text;
+};
+
+module.exports = { aiAgent };
