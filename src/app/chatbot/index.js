@@ -45,6 +45,20 @@ const chatBot = (io, socket) => {
       });
     }
   });
+  socket.on("user-send-chat-embedding", async (data) => {
+    console.log("data: ", data);
+    try {
+      EmbeddingBot({ content: data }).then((result) => {
+        console.log("result: ", result);
+        socket.emit("chat-embedding-response", result);
+      });
+    } catch (error) {
+      console.error("Lỗi khi cập nhật message:", error);
+      socket.emit("flow-update-error", {
+        message: "Có lỗi xảy ra khi cập nhật dữ liệu flow",
+      });
+    }
+  });
 };
 
 module.exports = { chatBot };
