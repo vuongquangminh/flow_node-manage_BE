@@ -133,7 +133,7 @@ const embeddingBot = async ({ content }) => {
   const retriever = vectorStore.asRetriever();
   //Tạo 1 chain và có lưu lịch sử trò chuyện
   const chain = ConversationalRetrievalQAChain.fromLLM(model, retriever);
-  // 6. Người dùng chat nhiều lượt
+  // 6. Người dùng chat nhiều lượt liên quan
   const response = await chain.invoke({
     question: content,
     chat_history: chatHistory,
