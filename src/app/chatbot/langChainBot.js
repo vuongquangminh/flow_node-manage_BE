@@ -146,7 +146,7 @@ const embeddingBot = async ({ content }) => {
   return response.text;
 };
 
-// Chat Hisstory
+// Chat Hisstory 
 const {
   StateGraph,
   MessagesAnnotation,
