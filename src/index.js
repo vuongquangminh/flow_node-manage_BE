@@ -14,7 +14,7 @@ const {
   traniingBot,
   chatHistory,
   chatgpt,
-} = require("./app/chatbot/langChainBot");
+} = require("./app/chatbot/chatCustomTool");
 const { aiAgent } = require("./app/chatbot/agent");
 
 // Tạo server HTTP từ app
