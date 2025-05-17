@@ -1,9 +1,9 @@
 const { aiAgent } = require("./agent");
+const { chatEmbeddingBot } = require("./chatEmbedding");
+const { chatgpt } = require("./chatGptBot");
+const { chatTavily } = require("./chatTavilyBot");
 const {
-  tavilySearchRealtime,
-  chatgpt,
   chatTool,
-  embeddingBot,
 } = require("./langChainBot");
 
 const chatBot = (io, socket) => {
@@ -38,7 +38,7 @@ const chatBot = (io, socket) => {
   socket.on("user-send-ai-agent-realtime", async (data) => {
     console.log("data: ", data);
     try {
-      tavilySearchRealtime({ content: data }).then((result) => {
+      chatTavily({ content: data }).then((result) => {
         console.log("result: ", result);
         socket.emit("ai-agent-realtime-response", result);
       });
@@ -51,7 +51,7 @@ const chatBot = (io, socket) => {
   });
   socket.on("user-send-chat-embedding", async (data) => {
     try {
-      embeddingBot({ content: data }).then((result) => {
+      chatEmbeddingBot({ content: data }).then((result) => {
         console.log("result: ", result);
         socket.emit("chat-embedding-response", result);
       });
