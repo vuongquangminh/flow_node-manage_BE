@@ -1,14 +1,21 @@
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const { model } = require("../utils");
 
+let historyMessages = [];
 
-let historyMessages = []
+const chatgpt = async ({ content }) => {
+  // Tạo mảng messages: lịch sử + message mới
+  const messages = [...historyMessages, new HumanMessage(content)];
+  console.log("messages: ", messages);
+  const response = await model.invoke(messages);
 
-const chatgpt = async ({ content, message, sessionId, config }) => {
-  const response = await model.invoke(historyMessages, new AIMessage(response.content));
-  historyMessages.push(new HumanMessage(content), )
-  console.log("AI trả lời:", response.content);
+  // Cập nhật lại history
+  historyMessages.push(
+    new HumanMessage(content),
+    new AIMessage(response.content)
+  );
+
   return response.content;
 };
 
-module.exports = {chatgpt}
+module.exports = { chatgpt };
