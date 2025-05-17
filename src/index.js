@@ -35,7 +35,7 @@ socketConfig(server);
 // tavilySearchRealtime();
 // trainingBot()
 // chatHistory()
-// aiAgent();
+aiAgent();
 // chatgpt({ content: "Tôi vừa hỏi gì" });
 
 // Bắt đầu server chung
