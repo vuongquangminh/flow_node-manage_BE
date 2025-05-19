@@ -1,8 +1,8 @@
-const { ChatOpenAI, OpenAIEmbeddings } = require("@langchain/openai");
-const { HumanMessage, AIMessage } = require("@langchain/core/messages");
+const { HumanMessage } = require("@langchain/core/messages");
 const { z } = require("zod");
 const { tool } = require("@langchain/core/tools");
 const { getContextVariable } = require("@langchain/core/context");
+const { model } = require("../utils");
 
 const chatCustomTool = async ({ content }) => {
   const adderSchema = z.object({
@@ -67,5 +67,5 @@ const chatCustomTool = async ({ content }) => {
 };
 
 module.exports = {
-  chatCustomTool
+  chatCustomTool,
 };

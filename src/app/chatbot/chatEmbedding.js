@@ -1,6 +1,4 @@
-
-const { ChatOpenAI, OpenAIEmbeddings } = require("@langchain/openai");
-const { TextLoader } = require("langchain/document_loaders/fs/text");
+const { OpenAIEmbeddings } = require("@langchain/openai");
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
 const { MemoryVectorStore } = require("langchain/vectorstores/memory");
 const { ConversationalRetrievalQAChain } = require("langchain/chains");

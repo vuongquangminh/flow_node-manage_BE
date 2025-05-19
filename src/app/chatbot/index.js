@@ -1,13 +1,13 @@
 const { aiAgent } = require("./agent");
+const { chatCustomTool } = require("./chatCustomTool");
 const { chatEmbeddingBot } = require("./chatEmbedding");
 const { chatgpt } = require("./chatGptBot");
 const { chatTavily } = require("./chatTavilyBot");
-const { chatTool } = require("./chatCustomTool");
 
 const chatBot = (io, socket) => {
   socket.on("user-send-chatTool", async (data) => {
     try {
-      chatTool({ content: data }).then((result) => {
+      chatCustomTool({ content: data }).then((result) => {
         console.log("result: ", result);
         socket.emit("chatTool-response", result.join("/n"));
       });

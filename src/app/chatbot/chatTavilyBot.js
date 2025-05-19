@@ -1,7 +1,7 @@
 require("cheerio");
 const { TavilySearch } = require("@langchain/tavily");
 const { model } = require("../utils");
-const { HumanMessage, AIMessage } = require("@langchain/core/messages");
+const { HumanMessage } = require("@langchain/core/messages");
 
 const chatTavily = async ({ content }) => {
   const search = new TavilySearch({
