@@ -22,7 +22,7 @@ const chatCustomTool = async ({ content }) => {
     },
     {
       name: "addTool",
-      description: "Adds two numbers together",
+      description: "Adds two numbers together!",
       schema: adderSchema,
     }
   );
