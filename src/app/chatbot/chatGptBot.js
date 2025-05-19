@@ -6,7 +6,6 @@ let historyMessages = [];
 const chatgpt = async ({ content }) => {
   // Tạo mảng messages: lịch sử + message mới
   const messages = [...historyMessages, new HumanMessage(content)];
-  console.log("messages: ", messages);
   const response = await model.invoke(messages);
 
   // Cập nhật lại history
