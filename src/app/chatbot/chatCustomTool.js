@@ -41,7 +41,7 @@ const chatCustomTool = async ({ content }) => {
     },
     {
       name: "multiplyTool",
-      description: "Multiples two numbers together",
+      description: "Multiples two numbers together!",
       schema: multipleSchema,
     }
   );
