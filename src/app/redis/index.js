@@ -9,7 +9,6 @@ const connectRedis = async () => {
 
 const setRedis = async (key, value) => {
   await createRedis.set(key, value);
-  console.log("success");
 };
 const getRedis = async (key) => {
   const result = await createRedis.get(key);
