@@ -1,3 +1,4 @@
+const { setRedis } = require("../redis");
 const { aiAgent } = require("./agent");
 const { chatCustomTool } = require("./chatCustomTool");
 const { chatEmbeddingBot } = require("./chatEmbedding");
@@ -24,6 +25,7 @@ const chatBot = (io, socket) => {
         content: data.message,
       }).then((result) => {
         console.log("result: ", result);
+        setRedis(data.message, result);
         socket.emit("chatbot-response", result);
       });
     } catch (error) {

@@ -8,14 +8,7 @@ const port = require("./app/config/index");
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
 const { socketConfig } = require("./app/sockets");
-const {
-  langChainBot,
-  tavilySearchRealtime,
-  traniingBot,
-  chatHistory,
-  chatgpt,
-} = require("./app/chatbot/chatCustomTool");
-const { aiAgent } = require("./app/chatbot/agent");
+const { connectRedis } = require("./app/redis");
 
 // Tạo server HTTP từ app
 const server = http.createServer(app);
@@ -30,7 +23,7 @@ db.connect();
 routeApp(app);
 //socket
 socketConfig(server);
-
+connectRedis();
 // langChainBot();
 // tavilySearchRealtime();
 // trainingBot()
