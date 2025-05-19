@@ -5,7 +5,6 @@ const createRedis = createClient({
 const connectRedis = async () => {
   createRedis.on("error", (err) => console.error("Redis error:", err));
   await createRedis.connect();
-  console.log("✅ Redis connected");
 };
 
 const setRedis = async (key, value) => {
