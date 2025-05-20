@@ -24,4 +24,4 @@ const completion = async ({ content }) => {
   return aiResponse;
 };
 
-module.exports = { completion };
+module.exports = { completion, openai };
