@@ -1,65 +1,84 @@
 const { HumanMessage } = require("@langchain/core/messages");
 const { z } = require("zod");
 const { tool } = require("@langchain/core/tools");
-const { getContextVariable } = require("@langchain/core/context");
 const { model } = require("../utils");
 
+// Tạo context chia sẻ giữa các tool
+const context = {
+  selectedProduct: null,
+};
+
 const chatCustomTool = async ({ content }) => {
-  const adderSchema = z.object({
-    a: z.number(),
-    b: z.number(),
+  const selectProductSchema = z.object({
+    product: z.string(),
+  });
+  const priceProductSchema = z.object({
+    product: z.string().optional(), // có thể là undefined nếu dùng context
   });
 
-  const multipleSchema = z.object({
-    a: z.number(),
-    b: z.number(),
-  });
-
-  const addTool = tool(
+  const advisoryNews = tool(
     async (input) => {
-      const sum = input.a + input.b;
-      return `The sum of ${input.a} and ${input.b} is ${sum}`;
+      return `Bạn muốn được tư vấn về dịch vụ gì?`;
     },
     {
-      name: "addTool",
-      description: "Adds two numbers together!",
-      schema: adderSchema,
+      name: "advisoryNews",
+      description: "Người dùng muốn hỏi về các vấn đề tư vấn.",
     }
   );
 
-  const multiplyTool = tool(
+  const config = {
+    configurable: {
+      context: {
+        selectedProduct: context.selectedProduct,
+      },
+    },
+  };
+  const selectProduct = tool(
     async (input) => {
-      const userId = getContextVariable("userId");
-      //validate Error
-      if (userId === undefined) {
-        console.log(
-          `No "userId" found in current context. Remember to call "setContextVariable('userId', value)";`
-        );
+      context.selectedProduct = input.product;
+      return `Bạn vừa chọn dịch vụ ${input.product}`;
+    },
+    {
+      name: "selectProduct",
+      description:
+        "Dùng khi người dùng nêu rõ tên dịch vụ họ muốn hỏi (ví dụ: 'Callbot', 'Chatbot')",
+      schema: selectProductSchema,
+    }
+  );
+  const priceProduct = tool(
+    async (input, runContext) => {
+      const product =
+        input.product || runContext?.configurable?.context?.selectedProduct;
+
+      if (!product) {
+        return "Bạn chưa chọn dịch vụ nào để tôi báo giá.";
       }
-      const multiple = input.a * input.b;
-      return `The multiple of ${input.a} and ${input.b} is ${multiple}`;
+      return `Giá của dịch vụ ${product} là ... (ví dụ: 500.000 VNĐ/tháng)`;
     },
     {
-      name: "multiplyTool",
-      description: "Multiples two numbers together!",
-      schema: multipleSchema,
+      name: "priceProduct",
+      description: `Dùng khi người dùng hỏi về giá dịch vụ, kể cả nếu họ nói chung chung như 'giá của nó', 'giá dịch vụ đó'...`,
+      schema: priceProductSchema,
     }
   );
 
-  const tools = [addTool, multiplyTool];
+  const tools = [advisoryNews, selectProduct, priceProduct];
 
-  const res = await model.bindTools(tools).invoke([new HumanMessage(content)]);
+  const res = await model
+    .bindTools(tools)
+    .invoke([new HumanMessage(content)], config);
 
   const toolsByName = {
-    addTool: addTool,
-    multiplyTool: multiplyTool,
+    advisoryNews: advisoryNews,
+    selectProduct: selectProduct,
+    priceProduct: priceProduct,
   };
   const messages = [];
 
   for (const toolCall of res.tool_calls) {
     const selectedTool = toolsByName[toolCall.name];
-    const toolMessage = await selectedTool.invoke(toolCall.args);
-    console.log("toolMessage: ", toolMessage);
+    const toolMessage = await selectedTool.invoke(toolCall.args, config);
+    console.log("toolCall: ", toolCall);
     messages.push(toolMessage);
   }
   console.log("messages:", messages);
