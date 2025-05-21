@@ -1,4 +1,4 @@
-const { HumanMessage } = require("@langchain/core/messages");
+const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const { z } = require("zod");
 const { tool } = require("@langchain/core/tools");
 const { model } = require("../utils");
@@ -7,6 +7,8 @@ const { model } = require("../utils");
 const context = {
   selectedProduct: null,
 };
+
+let historyMessages = [];
 
 const chatCustomTool = async ({ content }) => {
   const selectProductSchema = z.object({
@@ -17,7 +19,7 @@ const chatCustomTool = async ({ content }) => {
   });
 
   const advisoryNews = tool(
-    async (input) => {
+    async () => {
       return `Bạn muốn được tư vấn về dịch vụ gì?`;
     },
     {
@@ -66,7 +68,7 @@ const chatCustomTool = async ({ content }) => {
 
   const res = await model
     .bindTools(tools)
-    .invoke([new HumanMessage(content)], config);
+    .invoke([...historyMessages, new HumanMessage(content)], config);
 
   const toolsByName = {
     advisoryNews: advisoryNews,
@@ -87,10 +89,11 @@ const chatCustomTool = async ({ content }) => {
   for (const toolCall of res.tool_calls) {
     const selectedTool = toolsByName[toolCall.name];
     const toolMessage = await selectedTool.invoke(toolCall.args, config);
-    console.log("toolCall: ", toolCall);
+
+    historyMessages.push(new HumanMessage(content), new AIMessage(toolMessage));
     messages.push(toolMessage);
   }
-  console.log("messages:", messages);
+  console.log("historyMessages: ", historyMessages);
   return messages;
 };
 
