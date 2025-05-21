@@ -75,6 +75,15 @@ const chatCustomTool = async ({ content }) => {
   };
   const messages = [];
 
+  console.log("res: ", res);
+  if (!res.tool_calls || res.tool_calls.length === 0) {
+    // Không có tool nào được gọi, trả về từ ChatGPT trực tiếp
+    // const fallbackRes = await model.invoke([new HumanMessage(content)]);
+    // return [fallbackRes.text];
+    return [
+      "Xin lỗi, tôi chưa hiểu bạn muốn hỏi gì. Bạn có thể chọn dịch vụ để tôi hỗ trợ nhé!",
+    ];
+  }
   for (const toolCall of res.tool_calls) {
     const selectedTool = toolsByName[toolCall.name];
     const toolMessage = await selectedTool.invoke(toolCall.args, config);
