@@ -13,9 +13,13 @@ class AccountController {
     res.json(query);
   }
   async create(req, res, next) {
-    const query = await Account.create(req.body);
+    const query = await Account.exists({ email: req.body.email });
+    if (query) {
+      return res.status(404).json({ error: "Email đã tồn tại" });
+    }
+    const result = await Account.create(req.body);
 
-    res.json(query);
+    res.json(result);
   }
 }
 
