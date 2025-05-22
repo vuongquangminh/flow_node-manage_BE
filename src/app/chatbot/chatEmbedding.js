@@ -5,13 +5,15 @@ const { ConversationalRetrievalQAChain } = require("langchain/chains");
 const {
   CheerioWebBaseLoader,
 } = require("@langchain/community/document_loaders/web/cheerio");
+const { TextLoader } = require("langchain/document_loaders/fs/text");
 const { model } = require("../utils");
 
 let chatHistory = [];
 const chatEmbeddingBot = async ({ content }) => {
-  const loader = new CheerioWebBaseLoader(
-    "https://viblo.asia/announcements/chinh-thuc-cong-bo-the-le-chi-tiet-su-kien-viblo-mayfest-2025-decoding-a-decade-BQyJKvRQ4Me"
-  );
+  // const loader = new CheerioWebBaseLoader(
+  //   "https://viblo.asia/p/tang-toc-ung-dung-web-cua-ban-voi-web-workers-trong-react-va-vue-GAWVp7GoL05"
+  // );
+  const loader = new TextLoader("./src/dataTrain/test.txt"); 
   const docs = await loader.load();
   const textSplitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1000,
