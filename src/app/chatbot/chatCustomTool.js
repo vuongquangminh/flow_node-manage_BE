@@ -1,6 +1,4 @@
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
-const { z } = require("zod");
-const { tool } = require("@langchain/core/tools");
 const { model } = require("../utils");
 const {
   advisoryNews,
