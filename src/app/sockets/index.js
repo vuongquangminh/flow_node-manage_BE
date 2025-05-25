@@ -26,7 +26,7 @@ const socketConfig = (server) => {
 
     chatSocket(io, socket);
     chatBot(io, socket);
-    // Lấy mỗi ngày lúc 7 giờ sáng
+    // Lặp lịch gọi dữ liệu theo mỗi phút 
     cron.schedule("* * * * *", async () => {
       console.log("📅 Bắt đầu lấy dữ liệu thời tiết lúc 7h sáng...");
 
