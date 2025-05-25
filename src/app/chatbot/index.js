@@ -6,8 +6,10 @@ const { chatgpt } = require("./chatGptBot");
 const { chatTavily } = require("./chatTavilyBot");
 
 const chatBot = (io, socket) => {
+  
   socket.on("user-send-chatTool", async (data) => {
     try {
+      console.log("data: ", data);
       chatCustomTool({ content: data }).then((result) => {
         console.log("result: ", result);
         socket.emit("chatTool-response", result.join("/n"));

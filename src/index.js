@@ -3,12 +3,14 @@ const cors = require("cors");
 const http = require("http");
 const app = express();
 const port = require("./app/config/index");
-
+const cron = require("node-cron");
 // Kết nối DB và khai báo routes
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
 const { socketConfig } = require("./app/sockets");
 const { connectRedis } = require("./app/redis");
+const { weatherTool } = require("./app/chatbot/tool.js");
+const { chatCustomTool } = require("./app/chatbot/chatCustomTool");
 
 // Tạo server HTTP từ app
 const server = http.createServer(app);
@@ -30,6 +32,7 @@ connectRedis();
 // chatHistory()
 // aiAgent();
 // chatgpt({ content: "Tôi vừa hỏi gì" });
+
 
 // Bắt đầu server chung
 server.listen(port.port, () => {
