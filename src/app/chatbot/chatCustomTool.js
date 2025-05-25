@@ -54,7 +54,6 @@ const chatCustomTool = async ({ content }) => {
   };
   const messages = [];
 
-  // console.log("res: ", res);
   if (!res.tool_calls || res.tool_calls.length === 0) {
     // Không có tool nào được gọi, trả về từ ChatGPT trực tiếp
     // const fallbackRes = await model.invoke([new HumanMessage(content)]);
@@ -70,7 +69,6 @@ const chatCustomTool = async ({ content }) => {
     historyMessages.push(new HumanMessage(content), new AIMessage(toolMessage));
     messages.push(toolMessage);
   }
-  console.log("historyMessages: ", historyMessages);
   return messages;
 };
 
