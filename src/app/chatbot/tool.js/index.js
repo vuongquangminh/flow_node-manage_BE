@@ -188,11 +188,10 @@ Yêu cầu:
 - Độ ẩm hiện tại là bao nhiêu phần trăm?
 - Nếu có cảnh báo thời tiết đặc biệt thì hãy nêu rõ.
 
-Trả lời bằng tiếng Việt, văn phong thân thiện, dễ hiểu.
+Trả lời bằng tiếng Việt, văn phong thân thiện, dễ hiểu. Giữ nguyên định dạng trên, đừng gộp vào một đoạn văn.
 `;
       const llm = await model.invoke([new HumanMessage(prompt)]);
-      console.log("🧠 Phân tích:", llm.content);
-      return "123";
+      return llm.content;
     } catch (err) {}
   },
   {
