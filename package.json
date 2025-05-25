@@ -26,6 +26,7 @@
     "langchain": "^0.3.24",
     "mongoose": "^8.13.2",
     "mongoose-sequence": "^6.0.1",
+    "node-cron": "^4.0.7",
     "openai": "^4.97.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
