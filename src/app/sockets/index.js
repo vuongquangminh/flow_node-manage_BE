@@ -28,7 +28,7 @@ const socketConfig = (server) => {
     chatBot(io, socket);
     // Lặp lịch gọi dữ liệu theo mỗi phút 
     cron.schedule("* * * * *", async () => {
-      console.log("📅 Bắt đầu lấy dữ liệu thời tiết lúc 7h sáng...");
+      console.log("📅 Bắt đầu lấy dữ liệu thời tiết mỗi phút ...");
 
       chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
         console.log("result: ", result);
