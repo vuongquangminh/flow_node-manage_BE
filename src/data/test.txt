@@ -1,0 +1,39 @@
+# Giới thiệu Dịch vụ
+
+Chúng tôi cung cấp các giải pháp nhắn tin thương hiệu (Brandname) qua SMS và Zalo nhằm giúp doanh nghiệp tương tác hiệu quả với khách hàng.
+
+# Các Dịch vụ Chính
+
+## 1. Callbot
+- Dịch vụ gọi tự động đến khách hàng.
+- Ứng dụng trong khảo sát, thông báo lịch hẹn, nhắc nợ, v.v.
+- Gói cước:
+  - Gói 1 tháng: 500.000 VNĐ
+  - Gói 3 tháng: 1.200.000 VNĐ
+
+## 2. Chatbot Zalo
+- Trả lời tự động tin nhắn từ khách hàng trên Zalo OA.
+- Hỗ trợ lên kịch bản hội thoại, tích hợp form và database.
+- Gói cước:
+  - Gói Cơ bản: 300.000 VNĐ
+  - Gói Nâng cao: 800.000 VNĐ
+
+## 3. CPaaS (Communication Platform as a Service)
+- Nền tảng tích hợp các kênh SMS, Zalo, Call vào hệ thống doanh nghiệp.
+- Cho phép gửi tin nhắn OTP, CSKH, marketing.
+- Gói cước:
+  - Gói Starter: 1.000.000 VNĐ/tháng
+  - Gói Enterprise: 5.000.000 VNĐ/tháng
+
+# Cách Đăng Ký
+Để đăng ký dịch vụ, vui lòng cung cấp các thông tin sau:
+- Tên khách hàng
+- Số điện thoại
+- Email (tuỳ chọn)
+- Tên dịch vụ & gói cước
+
+Sau đó gửi về Zalo hoặc tổng đài để chúng tôi hỗ trợ bạn sớm nhất.
+
+# Chính sách
+- Hợp đồng tối thiểu 1 tháng.
+- Thanh toán trước bằng chuyển khoản ngân hàng.
