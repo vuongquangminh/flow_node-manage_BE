@@ -1,7 +1,9 @@
 const { tool } = require("@langchain/core/tools");
 const { default: axios } = require("axios");
 const { z } = require("zod");
-const fs = require('fs')
+const fs = require("fs");
+const { model } = require("../../utils");
+const { HumanMessage } = require("@langchain/core/messages");
 const selectProductSchema = z.object({
   product: z.string(),
 });
@@ -164,15 +166,33 @@ const weatherTool = tool(
   async (input) => {
     try {
       const api = process.env.OPENWEATHER_API_KEY;
-      const cityList = JSON.parse(fs.readFileSync("./src/data/city.list.json", "utf-8"));
-      console.log("cityList: ", cityList);
-      //   await axios
-      //     .get(
-      //       `https://api.openweathermap.org/data/2.5/weather?id=2172797&appid=${api}`
-      //     )
-      //     .then((response) => console.log(response.data))
-      //     .catch((error) => console.error(error));
-      return "123123";
+      const cityList = JSON.parse(
+        fs.readFileSync("./src/data/city.list.json", "utf-8")
+      );
+      const city = cityList.filter((item) => item.name == input.city);
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?id=${city[0].id}&appid=${api}`
+      );
+      const prompt = `
+Bạn là một trợ lý thời tiết. Tôi sẽ cung cấp dữ liệu JSON từ API thời tiết OpenWeather, 
+hãy phân tích và trả về thông tin dễ hiểu cho người dùng.
+
+Dữ liệu JSON:
+${JSON.stringify(response.data, null, 2)}
+
+Yêu cầu:
+- Nêu rõ địa điểm (tên thành phố, quốc gia nếu có).
+- Nhiệt độ hiện tại là bao nhiêu độ C?
+- Thời tiết có nắng, mưa hay mây? (mô tả chi tiết).
+- Tốc độ gió là bao nhiêu?
+- Độ ẩm hiện tại là bao nhiêu phần trăm?
+- Nếu có cảnh báo thời tiết đặc biệt thì hãy nêu rõ.
+
+Trả lời bằng tiếng Việt, văn phong thân thiện, dễ hiểu.
+`;
+      const llm = await model.invoke([new HumanMessage(prompt)]);
+      console.log("🧠 Phân tích:", llm.content);
+      return "123";
     } catch (err) {}
   },
   {
