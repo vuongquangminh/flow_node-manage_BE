@@ -1,5 +1,4 @@
 const { setRedis } = require("../redis");
-const { aiAgent } = require("./agent");
 const { chatCustomTool } = require("./chatCustomTool");
 const { chatEmbeddingBot } = require("./chatEmbedding");
 const { chatgpt } = require("./chatGptBot");
