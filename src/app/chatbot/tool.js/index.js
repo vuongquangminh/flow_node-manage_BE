@@ -213,15 +213,21 @@ Trả lời bằng tiếng Việt, văn phong thân thiện, dễ hiểu. Giữ 
 const commandMe = tool(
   async (input) => {
     console.log("input: ", input);
-    cron.schedule("7 23 * * *", async () => {
-      console.log("📅 Bắt đầu lấy dữ liệu thời tiết mỗi phút ...");
+    const convert = await model.invoke(`
+      Chuyển đổi văn bản sau thành biểu thức cron tương ứng (5 phần: phút giờ ngày tháng thứ).
+      
+      Văn bản: "${input.time}"
+      Trả về cron: 
+      `);
+    cron.schedule(convert.content, async () => {
+      console.log(`📅 Bắt đầu lấy dữ liệu thời tiết mỗi phút ...`);
 
       // chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
       //   console.log("result: ", result);
       //   socket.emit("chatTool-response", result.join("/n"));
       // });
     });
-    return 'aaa'
+    return "aaa";
   },
   {
     name: "commandMe",
