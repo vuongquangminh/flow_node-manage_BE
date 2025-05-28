@@ -220,7 +220,7 @@ const commandMe = tool(
       Trả về cron: 
       `);
     cron.schedule(convert.content, async () => {
-      console.log(`📅 Bắt đầu lấy dữ liệu thời tiết mỗi phút ...`);
+      console.log(`📅 Bắt đầu lấy ${input.target} theo ${input.time} ...`);
 
       // chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
       //   console.log("result: ", result);
