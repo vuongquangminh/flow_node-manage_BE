@@ -6,6 +6,7 @@ const { model } = require("../../utils");
 const { HumanMessage } = require("@langchain/core/messages");
 const { chatCustomTool } = require("../chatCustomTool");
 const cron = require("node-cron");
+const { chatTavily } = require("../chatTavilyBot");
 
 const selectProductSchema = z.object({
   product: z.string(),
@@ -222,6 +223,8 @@ const commandMe = tool(
     cron.schedule(convert.content, async () => {
       console.log(`📅 Bắt đầu lấy ${input.target} theo ${input.time} ...`);
 
+      const result = await chatTavily({ content: input.target });
+      console.log("cron: ", result);
       // chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
       //   console.log("result: ", result);
       //   socket.emit("chatTool-response", result.join("/n"));
