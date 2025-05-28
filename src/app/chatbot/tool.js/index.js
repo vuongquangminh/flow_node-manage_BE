@@ -4,6 +4,9 @@ const { z } = require("zod");
 const fs = require("fs");
 const { model } = require("../../utils");
 const { HumanMessage } = require("@langchain/core/messages");
+const { chatCustomTool } = require("../chatCustomTool");
+const cron = require("node-cron");
+
 const selectProductSchema = z.object({
   product: z.string(),
 });
@@ -31,6 +34,11 @@ const submitOrderSchema = z.object({
   name: z.string(),
   phone: z.string().regex(/^\d{9,11}$/),
   email: z.string().email().optional(),
+});
+
+const commandMeSchema = z.object({
+  target: z.string(),
+  time: z.any(),
 });
 
 const advisoryNews = tool(
@@ -202,6 +210,27 @@ Trả lời bằng tiếng Việt, văn phong thân thiện, dễ hiểu. Giữ 
   }
 );
 
+const commandMe = tool(
+  async (input) => {
+    console.log("input: ", input);
+    cron.schedule("7 23 * * *", async () => {
+      console.log("📅 Bắt đầu lấy dữ liệu thời tiết mỗi phút ...");
+
+      // chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
+      //   console.log("result: ", result);
+      //   socket.emit("chatTool-response", result.join("/n"));
+      // });
+    });
+    return 'aaa'
+  },
+  {
+    name: "commandMe",
+    description:
+      "Dùng khi người dùng hỏi về vấn đề lặp lịch cho 1 vấn đề gì đó VD: 'Lấy dữ liệu giá vàng hàng ngày', 'Lấy dữ liệu thời tiết theo giờ', v.v",
+    schema: commandMeSchema,
+  }
+);
+
 module.exports = {
   advisoryNews,
   suggestProduct,
@@ -211,4 +240,5 @@ module.exports = {
   inputCustomerInfo,
   submitOrder,
   weatherTool,
+  commandMe,
 };
