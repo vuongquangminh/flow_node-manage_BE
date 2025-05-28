@@ -26,15 +26,15 @@ const socketConfig = (server) => {
 
     chatSocket(io, socket);
     chatBot(io, socket);
-    // Lặp lịch gọi dữ liệu theo mỗi phút 
-    cron.schedule("* * * * *", async () => {
-      console.log("📅 Bắt đầu lấy dữ liệu thời tiết mỗi phút ...");
+    // Lặp lịch gọi dữ liệu theo mỗi phút
+    // cron.schedule("* * * * *", async () => {
+    //   console.log("📅 Bắt đầu lấy dữ liệu thời tiết mỗi phút ...");
 
-      chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
-        console.log("result: ", result);
-        socket.emit("chatTool-response", result.join("/n"));
-      });
-    });
+    //   chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
+    //     console.log("result: ", result);
+    //     socket.emit("chatTool-response", result.join("/n"));
+    //   });
+    // });
     // socket.on("disconnect", () => {
     //   console.log("User disconnected", socket.id);
     // });
