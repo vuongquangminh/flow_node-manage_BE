@@ -9,6 +9,7 @@ const {
   submitOrder,
   priceProduct,
   weatherTool,
+  commandMe,
 } = require("./tool.js");
 
 // Tạo context chia sẻ giữa các tool
@@ -36,6 +37,7 @@ const chatCustomTool = async ({ content }) => {
     submitOrder,
     priceProduct,
     weatherTool,
+    commandMe
   ];
 
   const res = await model
@@ -51,6 +53,7 @@ const chatCustomTool = async ({ content }) => {
     submitOrder: submitOrder,
     priceProduct: priceProduct,
     weatherTool: weatherTool,
+    commandMe: commandMe
   };
   const messages = [];
 
