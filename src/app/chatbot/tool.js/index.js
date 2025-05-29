@@ -7,169 +7,16 @@ const { HumanMessage } = require("@langchain/core/messages");
 const { chatCustomTool } = require("../chatCustomTool");
 const cron = require("node-cron");
 const { chatTavily } = require("../chatTavilyBot");
+const { sendMail } = require("./sendMail");
 
-const selectProductSchema = z.object({
-  product: z.string(),
-});
 const weatherSchema = z.object({
   city: z.string(),
-});
-const priceProductSchema = z.object({
-  product: z.string().optional(), // có thể là undefined nếu dùng context
-  package: z.string().optional(), // ví dụ: "basic", "pro", "premium", "1 tháng", "12 tháng"
-});
-
-const selectPackageSchema = z.object({
-  product: z.string().optional(), // có thể là undefined nếu dùng context
-  package: z.string(), // ví dụ: "basic", "pro", "premium", "1 tháng", "12 tháng"
-});
-const customerInfoSchema = z.object({
-  name: z.string(),
-  phone: z.string().regex(/^\d{9,11}$/),
-  email: z.string().email().optional(),
-});
-
-const submitOrderSchema = z.object({
-  product: z.string(),
-  package: z.string(), // ví dụ: "basic", "pro", "premium", "1 tháng", "12 tháng"
-  name: z.string(),
-  phone: z.string().regex(/^\d{9,11}$/),
-  email: z.string().email().optional(),
 });
 
 const commandMeSchema = z.object({
   target: z.string(),
   time: z.any(),
 });
-
-const advisoryNews = tool(
-  async () => {
-    return `Bạn muốn được tư vấn về dịch vụ gì?`;
-  },
-  {
-    name: "advisoryNews",
-    description: "Người dùng muốn bắt đầu cuộc trò chuyện.",
-  }
-);
-
-const suggestProduct = tool(
-  async (input) => {
-    return `Hiện tại đang có những dịch vụ như: Cpaas, Callbot, KYC, MyID`;
-  },
-  {
-    name: "suggestProduct",
-    description:
-      "Dùng khi người dùng hỏi về dịch vụ nào (VD: 'Có những dịch vụ gì', 'Đang có dịch vụ nào', v.v.)",
-  }
-);
-const selectProduct = tool(
-  async (input, runContext) => {
-    context.selectedProduct = input.product;
-    const product =
-      input.product || runContext?.configurable?.context?.selectedProduct;
-
-    if (!product) {
-      return "Bạn chưa chọn dịch vụ nào để tôi báo giá.";
-    }
-    return `Hiện tại dịch vụ ${product} đang có các gói cước như là... (ví dụ: 'Gói Pro ${product}', '1 tháng ${product}', '12 tháng ${product}', v.v.)`;
-  },
-  {
-    name: "selectProduct",
-    description:
-      "Dùng khi người dùng muốn hỏi về các gói cước của dịch vụ đã chọn (ví dụ: 'Callbot', 'Chatbot', 'Tôi muốn xem các gói cước Chatbot', v.v)",
-    schema: selectProductSchema,
-  }
-);
-
-const selectPackage = tool(
-  async (input, runContext) => {
-    const product =
-      input.product || runContext?.configurable?.context?.selectedProduct;
-
-    if (!product) {
-      return "Bạn chưa chọn dịch vụ nào để tôi báo giá.";
-    } else if (!input.package) {
-      return "Bạn chưa chọn gói cước cho dịch vụ";
-    }
-    context.selectpackage = input.package;
-
-    return `Bạn đã chọn gói dịch vụ: ${product} - ${input.package}. Nhập thông tin Tên, SĐT, Email để đặt hàng`;
-  },
-  {
-    name: "selectPackage",
-    description:
-      "Dùng khi người dùng xác nhận chọn gói cước vừa được đề xuất (VD: 'Gói Pro', '1 tháng', '12 tháng', 'Tôi muốn chọn gói Pro cho Cpaas', 'Cpaas - 1 tháng' v.v.)",
-    schema: selectPackageSchema,
-  }
-);
-const priceProduct = tool(
-  async (input, runContext) => {
-    const product =
-      input.product || runContext?.configurable?.context?.selectedProduct;
-    const package =
-      input.package || runContext?.configurable?.context?.selectPackage;
-    if (!product) {
-      return "Bạn chưa chọn dịch vụ nào để tôi báo giá.";
-    } else if (!package) {
-      return "Bạn chưa chọn gói của dịch vụ. VD: Gói pro, gói 1 tháng, v.v";
-    }
-    return `Giá của dịch vụ ${product} với gói ${package} là ... (ví dụ: 500.000 VNĐ/tháng)`;
-  },
-  {
-    name: "priceProduct",
-    description: `Dùng khi người dùng hỏi về giá dịch vụ, kể cả nếu họ nói chung chung như 'giá của nó', 'giá dịch vụ đó'...`,
-    schema: priceProductSchema,
-  }
-);
-
-const inputCustomerInfo = tool(
-  async (input, runContext) => {
-    context.customer = input;
-    const product =
-      input.product || runContext?.configurable?.context?.selectedProduct;
-    const package =
-      input.package || runContext?.configurable?.context?.selectPackage;
-    return `Đã nhận thông tin khách hàng: Dịch vụ: ${product}, Gói: ${package}, Tên: ${input.name}, SĐT: ${input.phone}. Gửi 'Xác nhận' để hoàn tất`;
-  },
-  {
-    name: "inputCustomerInfo",
-    description:
-      "Dùng khi người dùng cung cấp thông tin cá nhân để đăng ký dịch vụ",
-    schema: customerInfoSchema,
-  }
-);
-
-const submitOrder = tool(
-  async (input) => {
-    const { selectedProduct, selectpackage, customer } = context;
-    if (
-      !(selectedProduct || input.product) ||
-      !(selectpackage || input.package) ||
-      !(customer || input.name)
-    ) {
-      return "Bạn cần chọn dịch vụ, gói và cung cấp thông tin trước khi đặt.";
-    }
-
-    // Ví dụ: xử lý đơn hàng ở đây (gọi API backend, ghi DB, v.v.)
-    return `✅ Đặt dịch vụ thành công!\nDịch vụ: ${
-      input.product || selectedProduct
-    }\nGói: ${input.package || selectpackage}\nKhách hàng: ${
-      input.name || customer.name
-    } - ${input.phone || customer.phone}`;
-  },
-  {
-    name: "submitOrder",
-    description: `
-Dùng khi người dùng cung cấp đầy đủ thông tin để đăng ký dịch vụ trong cùng một tin nhắn. 
-Thông tin bao gồm: tên dịch vụ (product), gói dịch vụ (package), họ tên (name), số điện thoại (phone), 
-có thể kèm email. Ví dụ:
-
-- "Tôi muốn đặt dịch vụ Vbot gói 2 tháng. Tên Nguyễn Văn A, SĐT 0909123456"
-- "Đăng ký Cpaas - 1 tháng. Tên Minh, số 0888123456, email minh@gmail.com"
-`,
-    schema: submitOrderSchema,
-  }
-);
 
 const weatherTool = tool(
   async (input) => {
@@ -220,15 +67,19 @@ const commandMe = tool(
       Văn bản: "${input.time}"
       Trả về cron: 
       `);
+    console.log("convert.content: ", convert.content);
     cron.schedule(convert.content, async () => {
       console.log(`📅 Bắt đầu lấy ${input.target} theo ${input.time} ...`);
 
       const result = await chatTavily({ content: input.target });
-      console.log("cron: ", result);
-      // chatCustomTool({ content: "Thời tiết ở Lao Cai" }).then((result) => {
-      //   console.log("result: ", result);
-      //   socket.emit("chatTool-response", result.join("/n"));
-      // });
+      console.log("result: ", result);
+      sendMail({
+        to: "vuongquangminh120802@gmail.com",
+        subject: "Dự báo thời tiết hôm nay 🌤️",
+        text: "Nhiệt độ hôm nay là 30 độ C. Trời có nắng.",
+        html: `<h3>🌤️ Dự báo thời tiết</h3><p>Nhiệt độ hôm nay là <b>30°C</b>. Trời có nắng. ${result}</p>`,
+      });
+      console.log("ok: ");
     });
     return "aaa";
   },
@@ -241,13 +92,6 @@ const commandMe = tool(
 );
 
 module.exports = {
-  advisoryNews,
-  suggestProduct,
-  selectProduct,
-  selectPackage,
-  priceProduct,
-  inputCustomerInfo,
-  submitOrder,
   weatherTool,
   commandMe,
 };
