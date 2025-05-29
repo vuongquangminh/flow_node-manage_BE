@@ -67,7 +67,6 @@ const commandMe = tool(
       Văn bản: "${input.time}"
       Trả về cron: 
       `);
-    console.log("convert.content: ", convert.content);
     cron.schedule(convert.content, async () => {
       console.log(`📅 Bắt đầu lấy ${input.target} theo ${input.time} ...`);
 
