@@ -18,36 +18,42 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: EMAIL_REFRESH_TOKEN });
 
-const sendMail = async ({ to, subject, text, html }) => {
+const AiSendMail = async ({ to, subject, text, html }) => {
   try {
-    const accessToken = await oAuth2Client.getAccessToken();
-    console.log("accessToken: ", accessToken);
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: EMAIL_USER,
-        clientId: EMAIL_CLIENT_ID,
-        clientSecret: EMAIL_CLIENT_SECRET,
-        refreshToken: EMAIL_REFRESH_TOKEN,
-        accessToken: accessToken.token,
-      },
+    const url = oAuth2Client.generateAuthUrl({
+      // 'online' (default) or 'offline' (gets refresh_token)
+      access_type: "offline",
     });
+    console.log("url: ", url );
+    // console.log("oAuth2Client: ", oAuth2Client);
+    // const accessToken = await oAuth2Client.getAccessToken();
+    // console.log("accessToken: ", accessToken);
+    // const transporter = nodemailer.createTransport({
+    //   service: "gmail",
+    //   auth: {
+    //     type: "OAuth2",
+    //     user: EMAIL_USER,
+    //     clientId: EMAIL_CLIENT_ID,
+    //     clientSecret: EMAIL_CLIENT_SECRET,
+    //     refreshToken: EMAIL_REFRESH_TOKEN,
+    //     accessToken: accessToken.token,
+    //   },
+    // });
 
-    const mailOptions = {
-      from: `GPT Bot 🤖 <${EMAIL_USER}>`,
-      to,
-      subject,
-      text,
-      html,
-    };
+    // const mailOptions = {
+    //   from: `GPT Bot 🤖 <${EMAIL_USER}>`,
+    //   to,
+    //   subject,
+    //   text,
+    //   html,
+    // };
 
-    const result = await transporter.sendMail(mailOptions);
-    console.log("📧 Sent:", result.response);
-    return result;
+    // // const result = await transporter.sendMail(mailOptions);
+    // console.log("📧 Sent:", "123");
+    return "123";
   } catch (error) {
-    console.error("❌ Error sending email:", error);
+    console.error("❌ Error sending email:");
   }
 };
 
-module.exports = { sendMail };
+module.exports = { AiSendMail };

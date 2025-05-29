@@ -7,7 +7,7 @@ const { HumanMessage } = require("@langchain/core/messages");
 const { chatCustomTool } = require("../chatCustomTool");
 const cron = require("node-cron");
 const { chatTavily } = require("../chatTavilyBot");
-const { sendMail } = require("./sendMail");
+const { AiSendMail } = require("./sendMail");
 
 const weatherSchema = z.object({
   city: z.string(),
@@ -71,14 +71,13 @@ const commandMe = tool(
       console.log(`📅 Bắt đầu lấy ${input.target} theo ${input.time} ...`);
 
       const result = await chatTavily({ content: input.target });
-      console.log("result: ", result);
-      sendMail({
+      const kq = await AiSendMail({
         to: "vuongquangminh120802@gmail.com",
         subject: "Dự báo thời tiết hôm nay 🌤️",
         text: "Nhiệt độ hôm nay là 30 độ C. Trời có nắng.",
-        html: `<h3>🌤️ Dự báo thời tiết</h3><p>Nhiệt độ hôm nay là <b>30°C</b>. Trời có nắng. ${result}</p>`,
+        html: `<h3>🌤️ Dự báo thời tiết</h3><p>Nhiệt độ hôm nay là <b>30°C</b>. Trời có nắng.</p>`,
       });
-      console.log("ok: ");
+      console.log("ok: ", kq);
     });
     return "aaa";
   },

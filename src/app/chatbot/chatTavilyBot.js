@@ -14,7 +14,7 @@ const chatTavily = async ({ content }) => {
 
   const articles = result.results?.map((item) => item.content).join("\n\n");
 
-  console.log("articles: ", articles);
+  // console.log("articles: ", articles);
 
   const dataLlmsOutput = await model.invoke([
     new HumanMessage(`Hãy tóm tắt lại các thông tin này cho tôi : ${articles}`),
