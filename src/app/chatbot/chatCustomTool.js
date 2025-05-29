@@ -1,13 +1,6 @@
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const { model } = require("../utils");
 const {
-  advisoryNews,
-  suggestProduct,
-  selectProduct,
-  selectPackage,
-  inputCustomerInfo,
-  submitOrder,
-  priceProduct,
   weatherTool,
   commandMe,
 } = require("./tool.js");
@@ -29,15 +22,8 @@ const chatCustomTool = async ({ content }) => {
   };
 
   const tools = [
-    advisoryNews,
-    suggestProduct,
-    selectProduct,
-    selectPackage,
-    inputCustomerInfo,
-    submitOrder,
-    priceProduct,
     weatherTool,
-    commandMe
+    commandMe,
   ];
 
   const res = await model
@@ -45,15 +31,8 @@ const chatCustomTool = async ({ content }) => {
     .invoke([...historyMessages, new HumanMessage(content)], config);
 
   const toolsByName = {
-    advisoryNews: advisoryNews,
-    suggestProduct: suggestProduct,
-    selectProduct: selectProduct,
-    selectPackage: selectPackage,
-    inputCustomerInfo: inputCustomerInfo,
-    submitOrder: submitOrder,
-    priceProduct: priceProduct,
     weatherTool: weatherTool,
-    commandMe: commandMe
+    commandMe: commandMe,
   };
   const messages = [];
 
