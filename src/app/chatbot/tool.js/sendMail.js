@@ -20,11 +20,15 @@ oAuth2Client.setCredentials({ refresh_token: EMAIL_REFRESH_TOKEN });
 
 const AiSendMail = async ({ to, subject, text, html }) => {
   try {
-    const url = oAuth2Client.generateAuthUrl({
-      // 'online' (default) or 'offline' (gets refresh_token)
-      access_type: "offline",
-    });
-    console.log("url: ", url );
+    const accessTokenResponse = oAuth2Client.getAccessToken;
+    // accessTokenResponse can be a string or an object
+    // const accessToken =
+    //   typeof accessTokenResponse === "string"
+    //     ? accessTokenResponse
+    //     : accessTokenResponse?.token;
+    console.log("Access Token:", accessTokenResponse);
+    // ...existing code...
+    return "123";
     // console.log("oAuth2Client: ", oAuth2Client);
     // const accessToken = await oAuth2Client.getAccessToken();
     // console.log("accessToken: ", accessToken);

@@ -84,7 +84,7 @@ const commandMe = tool(
   {
     name: "commandMe",
     description:
-      "Dùng khi người dùng hỏi về vấn đề lặp lịch cho 1 vấn đề gì đó VD: 'Lấy dữ liệu giá vàng hàng ngày', 'Lấy dữ liệu thời tiết theo giờ', v.v",
+      "Dùng khi người dùng hỏi về vấn đề lặp lịch cho 1 vấn đề gì đó VD: 'Lấy dữ liệu giá vàng vào lúc 11:34', 'Lấy dữ liệu thời tiết theo giờ', v.v",
     schema: commandMeSchema,
   }
 );
