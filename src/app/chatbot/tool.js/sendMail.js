@@ -1,62 +1,37 @@
 // sendMail.js
 const nodemailer = require("nodemailer");
-const { google } = require("googleapis");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const {
-  EMAIL_CLIENT_ID,
-  EMAIL_CLIENT_SECRET,
-  EMAIL_REFRESH_TOKEN,
   EMAIL_USER,
+  EMAIL_APP_PASSWORD, // Thêm biến này vào .env
 } = process.env;
 
-const oAuth2Client = new google.auth.OAuth2(
-  EMAIL_CLIENT_ID,
-  EMAIL_CLIENT_SECRET,
-  "https://developers.google.com/oauthplayground" // redirect URL
-);
-oAuth2Client.setCredentials({ refresh_token: EMAIL_REFRESH_TOKEN });
-
 const AiSendMail = async ({ to, subject, text, html }) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_APP_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: EMAIL_USER,
+    to,
+    subject,
+    text,
+    html,
+  };
+
   try {
-    const accessTokenResponse = oAuth2Client.getAccessToken;
-    // accessTokenResponse can be a string or an object
-    // const accessToken =
-    //   typeof accessTokenResponse === "string"
-    //     ? accessTokenResponse
-    //     : accessTokenResponse?.token;
-    console.log("Access Token:", accessTokenResponse);
-    // ...existing code...
-    return "123";
-    // console.log("oAuth2Client: ", oAuth2Client);
-    // const accessToken = await oAuth2Client.getAccessToken();
-    // console.log("accessToken: ", accessToken);
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   auth: {
-    //     type: "OAuth2",
-    //     user: EMAIL_USER,
-    //     clientId: EMAIL_CLIENT_ID,
-    //     clientSecret: EMAIL_CLIENT_SECRET,
-    //     refreshToken: EMAIL_REFRESH_TOKEN,
-    //     accessToken: accessToken.token,
-    //   },
-    // });
-
-    // const mailOptions = {
-    //   from: `GPT Bot 🤖 <${EMAIL_USER}>`,
-    //   to,
-    //   subject,
-    //   text,
-    //   html,
-    // };
-
-    // // const result = await transporter.sendMail(mailOptions);
-    // console.log("📧 Sent:", "123");
-    return "123";
+    const result = await transporter.sendMail(mailOptions);
+    console.log("Email sent:", result);
+    return result;
   } catch (error) {
-    console.error("❌ Error sending email:");
+    console.error("Error sending email:", error);
+    throw error;
   }
 };
 

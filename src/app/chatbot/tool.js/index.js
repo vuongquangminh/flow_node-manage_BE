@@ -74,7 +74,7 @@ const commandMe = tool(
       const kq = await AiSendMail({
         to: "vuongquangminh120802@gmail.com",
         subject: "Dự báo thời tiết hôm nay 🌤️",
-        text: "Nhiệt độ hôm nay là 30 độ C. Trời có nắng.",
+        text: "Nhiệt độ hôm nay là 30 độ C. Trời có nắng to luôn.",
         html: `<h3>🌤️ Dự báo thời tiết</h3><p>Nhiệt độ hôm nay là <b>30°C</b>. Trời có nắng.</p>`,
       });
       console.log("ok: ", kq);
