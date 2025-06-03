@@ -52,8 +52,7 @@ AccountSchema.methods.generateAccessJWT = function () {
   let payload = {
     id: this._id,
     email: this.email,
-    name: this.name,
-    password: this.password,
+    name: this.name
   };
   return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
     expiresIn: "220m",

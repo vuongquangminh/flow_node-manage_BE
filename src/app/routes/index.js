@@ -3,12 +3,18 @@ const accountRoute = require("./account");
 const chatRoute = require("./chat");
 const friendRoute = require("./friend");
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, FRONTEND_URL, REDIRECT_URI } =
-  process.env;
+const {
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  FRONTEND_URL,
+  REDIRECT_URI,
+  SECRET_ACCESS_TOKEN,
+} = process.env;
 
 function routeApp(app) {
   app.use("/api", authRoute);
@@ -35,9 +41,38 @@ function routeApp(app) {
     );
 
     const accessToken = tokenResponse.data.access_token;
-    console.log("accessToken:", accessToken);
+    const userResponse = await axios.get("https://api.github.com/user", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
-    res.redirect(`${FRONTEND_URL}/oauth-callback?access_token=${accessToken}`);
+    let email = userResponse.data.email;
+    if (!email) {
+      // Nếu email bị ẩn, gọi thêm API này
+      const emailsResponse = await axios.get(
+        "https://api.github.com/user/emails",
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      // Tìm email primary và verified
+      const primaryEmail = emailsResponse.data.find(
+        (e) => e.primary && e.verified
+      );
+      email = primaryEmail ? primaryEmail.email : null;
+    }
+
+    console.log("email: ", email);
+    const payload = {
+      id: userResponse.id,
+      email: email,
+      name: userResponse.name,
+    };
+    const accessTokenApp = jwt.sign(payload, SECRET_ACCESS_TOKEN, {
+      expiresIn: "220m",
+    });
+    res.redirect(
+      `${FRONTEND_URL}/oauth-callback?access_token=${accessTokenApp}`
+    );
   });
 }
 
