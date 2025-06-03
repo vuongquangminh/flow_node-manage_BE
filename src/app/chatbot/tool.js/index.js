@@ -79,7 +79,7 @@ const commandMe = tool(
       });
       console.log("ok: ", kq);
     });
-    return "aaa";
+    return "Đã send";
   },
   {
     name: "commandMe",
