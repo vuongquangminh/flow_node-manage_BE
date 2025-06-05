@@ -22,9 +22,7 @@ const {
   GOOGLE_REDIRECT_URL,
 } = process.env;
 
-const scopes = [
-  "https://www.googleapis.com/auth/drive.metadata.readonly",
-  "https://www.googleapis.com/auth/calendar.readonly",
+const scopes = ["openid", "email", "profile"
 ];
 
 const oauth2Client = new google.auth.OAuth2(
