@@ -6,6 +6,8 @@ const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
 const dotenv = require("dotenv");
+const { google } = require("googleapis");
+
 dotenv.config();
 
 const {
@@ -14,7 +16,22 @@ const {
   FRONTEND_URL,
   REDIRECT_URI,
   SECRET_ACCESS_TOKEN,
+
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URL,
 } = process.env;
+
+const scopes = [
+  "https://www.googleapis.com/auth/drive.metadata.readonly",
+  "https://www.googleapis.com/auth/calendar.readonly",
+];
+
+const oauth2Client = new google.auth.OAuth2(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URL
+);
 
 function routeApp(app) {
   app.use("/api", authRoute);
@@ -24,6 +41,19 @@ function routeApp(app) {
   app.get("/auth/github", (_req, res) => {
     const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
     res.redirect(redirectUrl);
+  });
+  app.get("/auth/google", (_req, res) => {
+    // Generate a url that asks permissions for the Drive activity and Google Calendar scope
+    const authorizationUrl = oauth2Client.generateAuthUrl({
+      // 'online' (default) or 'offline' (gets refresh_token)
+      access_type: "offline",
+      /** Pass in the scopes array defined above.
+       * Alternatively, if only one scope is needed, you can pass a scope URL as a string */
+      scope: scopes,
+      // Enable incremental authorization. Recommended as a best practice.
+      include_granted_scopes: true,
+    });
+    res.redirect(authorizationUrl);
   });
 
   app.get("/auth/github/callback", async (req, res) => {
@@ -61,7 +91,6 @@ function routeApp(app) {
       email = primaryEmail ? primaryEmail.email : null;
     }
 
-    console.log("email: ", email);
     const payload = {
       id: userResponse.id,
       email: email,
@@ -73,6 +102,19 @@ function routeApp(app) {
     res.redirect(
       `${FRONTEND_URL}/oauth-callback?access_token=${accessTokenApp}`
     );
+  });
+  app.get("/auth/google/callback", async (req, res) => {
+    const code = req.query.code;
+
+    let { tokens } = await oauth2Client.getToken(code);
+    console.log("tokens: ", tokens.access_token);
+    const emailsResponse = await axios.get(
+      `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokens.access_token}`
+    );
+    console.log("emailsResponse: ", emailsResponse);
+    // res.redirect(
+    //   `${FRONTEND_URL}/oauth-callback?access_token=${tokens.access_token}`
+    // );
   });
 }
 
