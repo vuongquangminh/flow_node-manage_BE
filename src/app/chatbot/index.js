@@ -5,7 +5,6 @@ const { chatgpt } = require("./chatGptBot");
 const { chatTavily } = require("./chatTavilyBot");
 
 const chatBot = (io, socket) => {
-  
   socket.on("user-send-chatTool", async (data) => {
     try {
       chatCustomTool({ content: data }).then((result) => {
@@ -19,13 +18,14 @@ const chatBot = (io, socket) => {
     }
   });
   socket.on("user-send-chatbot", async (data) => {
+    console.log("data: ", data);
     try {
       chatgpt({
         content: data.message,
-      }).then((result) => {
-        console.log("result: ", result);
-        setRedis(data.message, result);
-        socket.emit("chatbot-response", result);
+        onToken: (token) => {
+          console.log("token: ", token);
+          socket.emit("chatbot-response", token);
+        },
       });
     } catch (error) {
       console.error("Lỗi khi cập nhật message:", error);
