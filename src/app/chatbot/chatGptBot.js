@@ -4,7 +4,7 @@ const { getRedis } = require("../redis");
 
 let historyMessages = [];
 
-const chatgpt = async ({ content }) => {
+const chatgpt = async ({ content, onToken }) => {
   // Tạo mảng messages: lịch sử + message mới
 
   const getCache = await getRedis(content);
@@ -12,15 +12,20 @@ const chatgpt = async ({ content }) => {
     return getCache;
   } else {
     const messages = [...historyMessages, new HumanMessage(content)];
-    const response = await model.invoke(messages);
+    const stream = await model.stream(messages);
 
+    let fullText = "";
+
+    for await (const chunk of stream) {
+      const token = chunk.content || ""; // phòng ngừa undefined
+      fullText += token;
+
+      // Gửi token về client (qua WebSocket, SSE, hoặc gọi hàm callback)
+      if (onToken) onToken(token);
+    }
     // Cập nhật lại history
-    historyMessages.push(
-      new HumanMessage(content),
-      new AIMessage(response.content)
-    );
+    historyMessages.push(new HumanMessage(content), new AIMessage(fullText));
 
-    return response.content;
   }
 };
 
