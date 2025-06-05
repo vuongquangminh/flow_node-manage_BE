@@ -22,8 +22,7 @@ const {
   GOOGLE_REDIRECT_URL,
 } = process.env;
 
-const scopes = ["openid", "email", "profile"
-];
+const scopes = ["openid", "email", "profile"];
 
 const oauth2Client = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
@@ -105,11 +104,16 @@ function routeApp(app) {
     const code = req.query.code;
 
     let { tokens } = await oauth2Client.getToken(code);
-    console.log("tokens: ", tokens.access_token);
-    const emailsResponse = await axios.get(
-      `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokens.access_token}`
+    oauth2Client.setCredentials(tokens);
+    const response = await axios.get(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`,
+        },
+      }
     );
-    console.log("emailsResponse: ", emailsResponse);
+    console.log("response: ", response.data.email);
     // res.redirect(
     //   `${FRONTEND_URL}/oauth-callback?access_token=${tokens.access_token}`
     // );
