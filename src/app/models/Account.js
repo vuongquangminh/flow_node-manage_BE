@@ -17,7 +17,6 @@ const AccountSchema = new Schema(
     },
     password: {
       type: String,
-      required: "Mật khẩu của bạn là bắt buộc",
       maxLength: 600,
     },
     friend: {

@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
 const dotenv = require("dotenv");
 const { google } = require("googleapis");
+const Account = require("../models/Account");
 
 dotenv.config();
 
@@ -125,6 +126,15 @@ function routeApp(app) {
     const accessTokenApp = jwt.sign(payload, SECRET_ACCESS_TOKEN, {
       expiresIn: "220m",
     });
+    const query = await Account.findOne({ email: response.data.email });
+    if (!query) {
+      // Nếu chưa có tài khoản, tạo mới
+      const newAccount = new Account({
+        email: response.data.email,
+        name: response.data.name,
+      });
+      await newAccount.save();
+    }
     res.redirect(
       `${FRONTEND_URL}/oauth-callback?access_token=${accessTokenApp}`
     );
