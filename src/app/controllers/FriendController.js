@@ -15,7 +15,6 @@ class FriendController {
     });
     return res.json(query);
   }
-
 }
 
 module.exports = new FriendController();

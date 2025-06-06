@@ -118,23 +118,25 @@ function routeApp(app) {
         },
       }
     );
-    const payload = {
-      id: response.data.id,
-      email: response.data.email,
-      name: response.data.name,
-    };
-    const accessTokenApp = jwt.sign(payload, SECRET_ACCESS_TOKEN, {
-      expiresIn: "220m",
-    });
     const query = await Account.findOne({ email: response.data.email });
+    let newData = query;
+
     if (!query) {
       // Nếu chưa có tài khoản, tạo mới
       const newAccount = new Account({
         email: response.data.email,
         name: response.data.name,
       });
-      await newAccount.save();
+      newData = await newAccount.save();
     }
+    const payload = {
+      id: newData._id,
+      email: newData.email,
+      name: newData.name,
+    };
+    const accessTokenApp = jwt.sign(payload, SECRET_ACCESS_TOKEN, {
+      expiresIn: "220m",
+    });
     res.redirect(
       `${FRONTEND_URL}/oauth-callback?access_token=${accessTokenApp}`
     );
