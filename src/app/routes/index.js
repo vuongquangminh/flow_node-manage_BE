@@ -35,22 +35,11 @@ function routeApp(app) {
   app.use("/api", accountRoute);
   app.use("/api", authMiddleware, chatRoute);
   app.use("/api", authMiddleware, friendRoute);
+
+  // GitHub OAuth2
   app.get("/auth/github", (_req, res) => {
     const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
     res.redirect(redirectUrl);
-  });
-  app.get("/auth/google", (_req, res) => {
-    // Generate a url that asks permissions for the Drive activity and Google Calendar scope
-    const authorizationUrl = oauth2Client.generateAuthUrl({
-      // 'online' (default) or 'offline' (gets refresh_token)
-      access_type: "offline",
-      /** Pass in the scopes array defined above.
-       * Alternatively, if only one scope is needed, you can pass a scope URL as a string */
-      scope: scopes,
-      // Enable incremental authorization. Recommended as a best practice.
-      include_granted_scopes: true,
-    });
-    res.redirect(authorizationUrl);
   });
 
   app.get("/auth/github/callback", async (req, res) => {
@@ -100,6 +89,21 @@ function routeApp(app) {
       `${FRONTEND_URL}/oauth-callback?access_token=${accessTokenApp}`
     );
   });
+
+  // Google OAuth2
+  app.get("/auth/google", (_req, res) => {
+    // Generate a url that asks permissions for the Drive activity and Google Calendar scope
+    const authorizationUrl = oauth2Client.generateAuthUrl({
+      // 'online' (default) or 'offline' (gets refresh_token)
+      access_type: "offline",
+      /** Pass in the scopes array defined above.
+       * Alternatively, if only one scope is needed, you can pass a scope URL as a string */
+      scope: scopes,
+      // Enable incremental authorization. Recommended as a best practice.
+      include_granted_scopes: true,
+    });
+    res.redirect(authorizationUrl);
+  });
   app.get("/auth/google/callback", async (req, res) => {
     const code = req.query.code;
 
@@ -113,10 +117,17 @@ function routeApp(app) {
         },
       }
     );
-    console.log("response: ", response.data.email);
-    // res.redirect(
-    //   `${FRONTEND_URL}/oauth-callback?access_token=${tokens.access_token}`
-    // );
+    const payload = {
+      id: response.data.id,
+      email: response.data.email,
+      name: response.data.name,
+    };
+    const accessTokenApp = jwt.sign(payload, SECRET_ACCESS_TOKEN, {
+      expiresIn: "220m",
+    });
+    res.redirect(
+      `${FRONTEND_URL}/oauth-callback?access_token=${accessTokenApp}`
+    );
   });
 }
 
