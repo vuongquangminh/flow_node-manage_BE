@@ -3,6 +3,10 @@ const Friend = require("../models/Friend");
 
 class AccountController {
   //GET: account
+  async me(req, res, next) {
+    const query = await Account.findOne({ email: req.user.email });
+    res.json(query);
+  }
   async get(req, res, next) {
     const query = await Account.find({});
     res.json(query);
