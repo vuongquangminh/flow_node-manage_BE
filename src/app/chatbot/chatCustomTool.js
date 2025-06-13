@@ -1,9 +1,6 @@
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const { model } = require("../utils");
-const {
-  weatherTool,
-  commandMe,
-} = require("./tool.js");
+const { weatherTool, commandMe } = require("./tool.js");
 
 // Tạo context chia sẻ giữa các tool
 const context = {
@@ -21,10 +18,7 @@ const chatCustomTool = async ({ content }) => {
     },
   };
 
-  const tools = [
-    weatherTool,
-    commandMe,
-  ];
+  const tools = [weatherTool, commandMe];
 
   const res = await model
     .bindTools(tools)
