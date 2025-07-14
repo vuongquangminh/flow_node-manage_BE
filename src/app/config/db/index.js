@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 const { URI } = require("../../config/index");
 
@@ -12,6 +13,7 @@ async function connect() {
     console.log("connect success");
   } catch (error) {
     console.log("connect false");
+    console.log(error);
   }
 }
 module.exports = { connect };

@@ -1,8 +1,10 @@
+
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const app = express();
-const port = require("./app/config/index");
+const env = require("./app/config/index");
 // Kết nối DB và khai báo routes
 const db = require("./app/config/db");
 const routeApp = require("./app/routes");
@@ -30,8 +32,9 @@ connectRedis();
 // aiAgent();
 // chatgpt({ content: "Tôi vừa hỏi gì" });
 
+const PORT = process.env.PORT || env.port || 3000;
 
 // Bắt đầu server chung
-server.listen(port.port, () => {
-  console.log(`Server running at http://localhost:${port.port}`);
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
