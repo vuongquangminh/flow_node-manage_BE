@@ -25,12 +25,6 @@ routeApp(app);
 //socket
 socketConfig(server);
 connectRedis();
-// langChainBot();
-// tavilySearchRealtime();
-// trainingBot()
-// chatHistory()
-// aiAgent();
-// chatgpt({ content: "Tôi vừa hỏi gì" });
 
 const PORT = process.env.PORT || env.port || 3000;
 
