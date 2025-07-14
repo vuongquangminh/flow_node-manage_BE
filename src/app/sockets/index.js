@@ -17,7 +17,7 @@ const socketConfig = (server) => {
     cors: {
       origin: [
         "http://localhost:5173",
-        "https://flow-node-manage-be.onrender.com",
+        "https://flow-node-manage-be.onrender.com/socket.io/",
       ], // Cho phép frontend React truy cập
 
       methods: ["GET", "POST"],
