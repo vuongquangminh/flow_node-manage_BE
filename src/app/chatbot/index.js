@@ -23,7 +23,6 @@ const chatBot = (io, socket) => {
       chatgpt({
         content: data.message,
         onToken: (token) => {
-          console.log("token: ", token);
           socket.emit("chatbot-response", token);
         },
       });

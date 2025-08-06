@@ -1,5 +1,4 @@
-
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
@@ -24,7 +23,7 @@ db.connect();
 routeApp(app);
 //socket
 socketConfig(server);
-connectRedis();
+// connectRedis();
 
 const PORT = process.env.PORT || env.port || 3000;
 

@@ -7,26 +7,22 @@ let historyMessages = [];
 const chatgpt = async ({ content, onToken }) => {
   // Tạo mảng messages: lịch sử + message mới
 
-  const getCache = await getRedis(content);
-  if (getCache) {
-    return getCache;
-  } else {
-    const messages = [...historyMessages, new HumanMessage(content)];
-    const stream = await model.stream(messages);
+  const messages = [...historyMessages, new HumanMessage(content)];
+  const stream = await model.stream(messages);
 
-    let fullText = "";
+  let fullText = "";
 
-    for await (const chunk of stream) {
-      const token = chunk.content || ""; // phòng ngừa undefined
-      fullText += token;
+  for await (const chunk of stream) {
+    const token = chunk.content || ""; // phòng ngừa undefined
+    fullText += token;
 
-      // Gửi token về client (qua WebSocket, SSE, hoặc gọi hàm callback)
-      if (onToken) onToken(token);
-    }
-    // Cập nhật lại history
-    historyMessages.push(new HumanMessage(content), new AIMessage(fullText));
-
+    // Gửi token về client (qua WebSocket, SSE, hoặc gọi hàm callback)
+    if (onToken) onToken(token);
   }
+  // Cập nhật lại history
+  historyMessages.push(new HumanMessage(content), new AIMessage(fullText));
+
+  // }
 };
 
 module.exports = { chatgpt };
