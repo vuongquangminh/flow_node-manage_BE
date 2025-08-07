@@ -2,6 +2,7 @@ const authRoute = require("./auth");
 const accountRoute = require("./account");
 const chatRoute = require("./chat");
 const friendRoute = require("./friend");
+const productRoute = require("./product");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
@@ -32,11 +33,6 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 function routeApp(app) {
-  app.use("/api", authRoute);
-  app.use("/api", accountRoute);
-  app.use("/api", authMiddleware, chatRoute);
-  app.use("/api", authMiddleware, friendRoute);
-
   // GitHub OAuth2
   app.get("/auth/github", (_req, res) => {
     const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
@@ -141,6 +137,12 @@ function routeApp(app) {
       `${FRONTEND_URL}/oauth-callback?access_token=${accessTokenApp}`
     );
   });
+
+  app.use("/api", authRoute);
+  app.use("/api", accountRoute);
+  app.use("/api", productRoute);
+  app.use("/api", authMiddleware, chatRoute);
+  app.use("/api", authMiddleware, friendRoute);
 }
 
 module.exports = routeApp;

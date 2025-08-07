@@ -6,34 +6,42 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const ProductSchema = new Schema(
   {
     _id: Number,
-    name: {
-      type: String,
+    name: String,
+    price: String,
+    image: String,
+    type_bag: String,
+    size: [String],
+    color: [
+      {
+        id: Number,
+        name: String,
+        image_color: [String],
+      },
+    ],
+    title: String,
+    rate: String,
+    sold: String,
+    dimensions: String,
+    weight: String,
+    feature: [String],
+    composition_maintenance: {
+      title: String,
+      composition: [String],
+      entretien: [String],
     },
-    price: {
-      type: String,
+    sustainability_guarantee: {
+      title: String,
+      description: String,
+      item: [
+        {
+          logo: String,
+          title: String,
+          description: String,
+        },
+      ],
     },
-    image: {
-      type: String,
-    },
-    id_user_2: {
-      type: Number,
-      required: "id user 2 là bắt buộc",
-      maxLength: 255,
-    },
-    email_user_2: {
-      type: String,
-      required: "Email user 2 là bắt buộc",
-      maxLength: 255,
-    },
-    name_user_2: {
-      type: String,
-      required: "Tên user 2 là bắt buộc",
-      maxLength: 600,
-    },
-    createAt: { type: Date, default: Date.now },
-    upDateAt: { type: Date, default: Date.now },
   },
-  { _id: false }
+  { _id: false, timestamps: true }
 );
 
 ProductSchema.plugin(AutoIncrement, { id: "product_id_counter" });
