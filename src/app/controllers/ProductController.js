@@ -3,12 +3,34 @@ const Product = require("../models/Product");
 class ProductController {
   //GET: products
   async get(req, res, next) {
-    const query = await Product.find(
-      req.params.type_bag ? { type_bag: req.params.type_bag } : {}
-    )
-      .sort({ createAt: "desc" })
-      .limit(10);
-    res.json(query);
+    try {
+      // Lấy page từ query, mặc định là 1
+      const page = parseInt(req.query.page) || 1;
+      const limit = 5;
+      const skip = (page - 1) * limit;
+
+      const query = await Product.find(
+        req.params.type_bag ? { type_bag: req.params.type_bag } : {}
+      )
+        .sort({ createdAt: -1 }) // -1 là mới nhất
+        .skip(skip) // bỏ qua số phần tử đã lấy
+        .limit(limit);
+
+      const total = await Product.countDocuments(
+        req.params.type_bag ? { type_bag: req.params.type_bag } : {}
+      );
+
+      console.log(query, "query");
+      res.json({
+        data: query,
+        message: "Lấy dữ liệu Product thành công!",
+        total,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
   //POST: product
   async post(req, res, next) {
