@@ -20,7 +20,6 @@ class ProductController {
         req.params.type_bag ? { type_bag: req.params.type_bag } : {}
       );
 
-      console.log(query, "query");
       res.json({
         data: query,
         message: "Lấy dữ liệu Product thành công!",
@@ -29,6 +28,16 @@ class ProductController {
         totalPages: Math.ceil(total / limit),
       });
     } catch (err) {
+      next(err);
+    }
+  }
+  //GET DETAIL: product
+  async show(req, res) {
+    try {
+      const query = await Product.findOne({ _id: req.params.id });
+      console.log("id: ", req.query.id);
+      res.json({ data: query, message: "Lấy dữ liệu chi tiết thành công" });
+    } catch (error) {
       next(err);
     }
   }
