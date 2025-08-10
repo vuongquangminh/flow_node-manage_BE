@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
-const CartSchema = new Schema(
+const OrderSchema = new Schema(
   {
     _id: Number,
     product_id: Number,
@@ -21,6 +21,6 @@ const CartSchema = new Schema(
   { _id: false, timestamps: true }
 );
 
-CartSchema.plugin(AutoIncrement, { id: "cart_id_counter" });
+OrderSchema.plugin(AutoIncrement, { id: "order_id_counter" });
 
-module.exports = mongoose.model("Cart", CartSchema);
+module.exports = mongoose.model("Order", OrderSchema);

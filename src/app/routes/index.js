@@ -1,7 +1,7 @@
 const authRoute = require("./auth");
 const accountRoute = require("./account");
 const chatRoute = require("./chat");
-const cartRoute = require("./cart");
+const orderRoute = require("./order");
 const friendRoute = require("./friend");
 const productRoute = require("./product");
 const axios = require("axios");
@@ -142,7 +142,7 @@ function routeApp(app) {
   app.use("/api", authRoute);
   app.use("/api", accountRoute);
   app.use("/api", productRoute);
-  app.use("/api", authMiddleware, cartRoute);
+  app.use("/api", authMiddleware, orderRoute);
   app.use("/api", authMiddleware, chatRoute);
   app.use("/api", authMiddleware, friendRoute);
 }

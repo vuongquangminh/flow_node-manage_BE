@@ -35,7 +35,6 @@ class ProductController {
   async show(req, res) {
     try {
       const query = await Product.findOne({ _id: req.params.id });
-      console.log("id: ", req.query.id);
       res.json({ data: query, message: "Lấy dữ liệu chi tiết thành công" });
     } catch (error) {
       next(err);
