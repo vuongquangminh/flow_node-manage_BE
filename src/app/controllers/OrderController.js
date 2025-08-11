@@ -37,22 +37,27 @@ class OrderController {
   async post(req, res, next) {
     const user = req.user;
     const body = req.body;
-    const product = await Product.findOne({ _id: body.product_id });
-    const data = {
-      product_id: body.product_id,
-      product_name: product.name,
+
+    const dataProducts = await Promise.all(body.products.map( async(item) => {
+      const product = await Product.findOne({ _id: item.product_id });
+      return {
+        product_id: product._id,
+        product_name: product.name,
+        price: product.price,
+        image: product.image,
+        size: item.size,
+        color: item.color,
+        quantity: 1,
+      };
+    }));
+
+    const result = await Order.create({
       user_id: user.id,
       user_name: user.name,
-      price: product.price,
-      image: product.image,
-      size: body.size,
-      color: body.color,
-      quantity: body.quantity,
+      products: dataProducts,
       address: body.address,
-      phone: body.phone,
-    };
-    console.log("data: ", data);
-    const result = await Order.create(data);
+      phone: body.phone
+    });
     if (result) {
       res.json({ message: "Đặt hàng thành công!", result });
     }

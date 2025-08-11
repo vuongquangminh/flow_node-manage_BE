@@ -6,15 +6,19 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const OrderSchema = new Schema(
   {
     _id: Number,
-    product_id: Number,
-    product_name: String,
     user_id: Number,
     user_name: String,
-    price: String,
-    image: String,
-    size: String,
-    color: String,
-    quantity: Number,
+    products: [
+      {
+        product_id: Number,
+        product_name: String,
+        image: String,
+        price: String,
+        size: String,
+        color: String,
+        quantity: Number,
+      },
+    ],
     address: String,
     phone: String,
   },
