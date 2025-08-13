@@ -5,28 +5,12 @@ class OrderController {
   //GET: order
   async get(req, res, next) {
     try {
-      // Lấy page từ query, mặc định là 1
-      const page = parseInt(req.query.page) || 1;
-      const limit = 5;
-      const skip = (page - 1) * limit;
-
-      const query = await Order.find(
-        req.query.name ? { type_bag: req.query.name } : {}
-      )
-        .sort({ createdAt: -1 }) // -1 là mới nhất
-        .skip(skip) // bỏ qua số phần tử đã lấy
-        .limit(limit);
-
-      const total = await Order.countDocuments(
-        req.params.type_bag ? { type_bag: req.params.type_bag } : {}
-      );
-
+      const query = await Order.find({ user_id: req.params.user_id }).sort({
+        createdAt: -1,
+      });
       res.json({
         data: query,
         message: "Lấy dữ liệu Order thành công!",
-        total,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
       });
     } catch (err) {
       next(err);
@@ -59,6 +43,7 @@ class OrderController {
       products: dataProducts,
       address: body.address,
       phone: body.phone,
+      code: body.code,
     });
     if (result) {
       res.json({ message: "Đặt hàng thành công!", result });
