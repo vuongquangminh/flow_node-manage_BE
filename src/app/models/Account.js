@@ -22,6 +22,8 @@ const AccountSchema = new Schema(
     friend: {
       type: Number,
     },
+    address: String,
+    phone: String,
     status: {
       type: Boolean,
     },
@@ -51,7 +53,7 @@ AccountSchema.methods.generateAccessJWT = function () {
   let payload = {
     id: this._id,
     email: this.email,
-    name: this.name
+    name: this.name,
   };
   return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
     expiresIn: "220m",
