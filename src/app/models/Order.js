@@ -22,6 +22,7 @@ const OrderSchema = new Schema(
     address: String,
     phone: String,
     code: String,
+    status: Number,
   },
   { _id: false, timestamps: true }
 );

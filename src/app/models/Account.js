@@ -27,6 +27,7 @@ const AccountSchema = new Schema(
     status: {
       type: Boolean,
     },
+    role: String,
     createAt: { type: Date, default: Date.now },
     upDateAt: { type: Date, default: Date.now },
   },

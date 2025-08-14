@@ -44,9 +44,59 @@ class OrderController {
       address: body.address,
       phone: body.phone,
       code: body.code,
+      status: 0,
     });
     if (result) {
       res.json({ message: "Đặt hàng thành công!", result });
+    }
+  }
+
+  //DELETE: order
+  async delete(req, res, next) {
+    try {
+      const result = await Order.updateOne(
+        {
+          _id: req.params.id,
+        },
+        { status: 1 }
+      );
+      res.json({
+        data: result,
+        message: "Xóa dữ liệu Order thành công!",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+  async getAdmin(req, res, next) {
+    try {
+      const query = await Order.find({}).sort({
+        createdAt: -1,
+      });
+      res.json({
+        data: query,
+        message: "Lấy dữ liệu Order thành công!",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async approve(req, res, next) {
+    try {
+      console.log("status: ", req.body);
+      const result = await Order.updateOne(
+        {
+          _id: req.params.id,
+        },
+        { status: req.body.status }
+      );
+      res.json({
+        data: result,
+        message: "Xác nhận thanh toán!",
+      });
+    } catch (err) {
+      next(err);
     }
   }
 }
