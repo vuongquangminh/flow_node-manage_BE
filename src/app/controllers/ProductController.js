@@ -47,6 +47,15 @@ class ProductController {
       res.json({ message: "Bạn đã lưu dữ liệu Product thành công!", data });
     }
   }
+
+  async getAll(req, res, next) {
+    try {
+      const query = await Product.find({});
+      res.json({ data: query, message: "Lấy dữ liệu product thành công" });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new ProductController();

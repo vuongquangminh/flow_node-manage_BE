@@ -25,6 +25,21 @@ class AccountController {
 
     res.json(result);
   }
+  async delete(req, res, next) {
+    try {
+      const result = await Account.deleteOne({ _id: req.params.id });
+  
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ message: "Không tìm thấy user" });
+      }
+  
+      res.json({
+        message: "Xoá user thành công",
+      });
+    } catch (error) {
+      next(error); // hoặc res.status(500).json({ error: error.message })
+    }
+  }
 }
 
 module.exports = new AccountController();

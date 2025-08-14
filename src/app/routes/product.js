@@ -5,5 +5,6 @@ const router = express.Router();
 router.get("/products", ProductController.get);
 router.get("/products/:id", ProductController.show);
 router.post("/product", ProductController.post);
+router.get("/admin/products", ProductController.getAll);
 
 module.exports = router;
