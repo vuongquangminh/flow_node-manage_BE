@@ -8,5 +8,6 @@ router.post("/account/register", AccountController.create);
 router.get("/account", authMiddleware, AccountController.get);
 router.get("/account/me", authMiddleware, AccountController.me);
 router.get("/account/:id", authMiddleware, AccountController.getById);
+router.delete("/admin/account/:id", authMiddleware, AccountController.delete);
 
 module.exports = router;
