@@ -40,6 +40,17 @@ class ProductController {
       next(err);
     }
   }
+
+  //SEARCH
+  async search(req, res, next) {
+    try {
+      const query = await Product.find({
+        name: { $regex: ".*" + req.query.name + ".*" },
+      }).limit(4);
+      res.json({ data: query, message: "Lấy dữ liệu chi tiết thành công" });
+    } catch (err) {}
+  }
+
   //POST: product
   async post(req, res, next) {
     const data = await Product.create(req.body);
