@@ -25,11 +25,14 @@ class OrderController {
     const dataProducts = await Promise.all(
       body.products.map(async (item) => {
         const product = await Product.findOne({ _id: item.product_id });
+        const image = await product.color.filter(
+          (img) => img.name == item.color
+        );
         return {
           product_id: product._id,
           product_name: product.name,
           price: product.price,
-          image: product.image,
+          image: image[0].image_color[0],
           size: item.size,
           color: item.color,
           quantity: 1,
