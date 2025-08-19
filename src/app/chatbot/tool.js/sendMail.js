@@ -8,7 +8,7 @@ const {
   EMAIL_APP_PASSWORD, // Thêm biến này vào .env
 } = process.env;
 
-const AiSendMail = async ({ to, subject, text, html }) => {
+const SendMail = async ({ to, subject, text, html }) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -35,4 +35,4 @@ const AiSendMail = async ({ to, subject, text, html }) => {
   }
 };
 
-module.exports = { AiSendMail };
+module.exports = { SendMail };
