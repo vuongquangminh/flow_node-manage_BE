@@ -10,10 +10,8 @@ const { model } = require("../utils");
 
 let chatHistory = [];
 const chatEmbeddingBot = async ({ content }) => {
-  // const loader = new CheerioWebBaseLoader(
-  //   "https://viblo.asia/p/tang-toc-ung-dung-web-cua-ban-voi-web-workers-trong-react-va-vue-GAWVp7GoL05"
-  // );
-  const loader = new TextLoader("./src/data/test.txt"); 
+  // const loader = new CheerioWebBaseLoader("https://www.cabaia.com/");
+  const loader = new TextLoader("./src/data/test.txt");
   const docs = await loader.load();
   const textSplitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1000,

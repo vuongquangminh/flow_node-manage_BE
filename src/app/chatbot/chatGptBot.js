@@ -1,6 +1,5 @@
 const { HumanMessage, AIMessage } = require("@langchain/core/messages");
 const { model } = require("../utils");
-const { getRedis } = require("../redis");
 
 let historyMessages = [];
 
@@ -21,8 +20,6 @@ const chatgpt = async ({ content, onToken }) => {
   }
   // Cập nhật lại history
   historyMessages.push(new HumanMessage(content), new AIMessage(fullText));
-
-  // }
 };
 
 module.exports = { chatgpt };

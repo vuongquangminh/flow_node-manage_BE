@@ -59,10 +59,33 @@ class ProductController {
     }
   }
 
+  async edit(req, res, next) {
+    const data = await Product.updateOne({ _id: req.params.id }, req.body);
+    if (data) {
+      res.json({
+        message: "Bạn đã cập nhật dữ liệu Product thành công!",
+        data,
+      });
+    }
+  }
+
   async getAll(req, res, next) {
     try {
       const query = await Product.find({});
       res.json({ data: query, message: "Lấy dữ liệu product thành công" });
+    } catch (err) {
+      next(err);
+    }
+  }
+  async delete(req, res, next) {
+    try {
+      const result = await Product.deleteOne({
+        _id: req.params.id,
+      });
+      res.json({
+        data: result,
+        message: "Xóa dữ liệu Order thành công!",
+      });
     } catch (err) {
       next(err);
     }
