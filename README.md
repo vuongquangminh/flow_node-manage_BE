@@ -2,17 +2,18 @@
 
 ## Giới thiệu
 
-Dự án này là một nền tảng tích hợp chatbot, hỗ trợ nhiều tính năng như trò chuyện thời gian thực, tìm kiếm thông tin, dự báo thời tiết, và quản lý tài khoản. Nền tảng sử dụng các công nghệ hiện đại như LangChain, OpenAI, Redis, và Socket.IO để cung cấp trải nghiệm tương tác thông minh và hiệu quả.
+Dự án này là một sản phẩm bán hàng có tích hợp chatbot, hỗ trợ nhiều tính năng như trò chuyện thời gian thực, tìm kiếm thông tin, quản lý sản phẩm, quản lý đơn hàng và quản lý tài khoản. Nền tảng sử dụng các công nghệ hiện đại như LangChain, OpenAI, Redis, và Socket.IO để cung cấp trải nghiệm tương tác thông minh và hiệu quả.
 
 ## Các tính năng chính
 
+- **Login, Logout, Register, OAuth2**: AAuthorization 
+- **CRUD account**: Admin quản lý tài khoản người dùng
+- **CRUD product**: Admin quản lý sản phẩm đưa lên thị trường.
+- **CRUD đơn hàng**: User có thể quản lý giỏ hàng của mình khi đã đăng nhập.
+- **Landing page giới thiệu sản phẩm**: Trang hiển thị giao diện chào mời khách hàng và sản phẩm nổi bật cùng những thông tin của sản phẩm.
+- **Chi tiết sản phẩm**: Xem chi tiết thông số chọn size màu sắc cho sản phẩm.
+- **Gửi email tự động**: Gửi mail tự động khi người dùng đã đăng nhập và đặt hàng..
 - **Chatbot AI**: Tích hợp OpenAI GPT-3.5 để hỗ trợ trò chuyện thông minh.
-- **Chatbot Tìm kiếm**: Sử dụng Tavily Search để tìm kiếm và tóm tắt thông tin từ các nguồn dữ liệu.
-- **Dự báo thời tiết**: Tích hợp API OpenWeather để cung cấp thông tin thời tiết chi tiết.
-- **Quản lý tài khoản**: Hỗ trợ đăng ký, đăng nhập, và quản lý thông tin người dùng.
-- **Lịch sử trò chuyện**: Lưu trữ và truy xuất lịch sử trò chuyện.
-- **Tích hợp OAuth2**: Hỗ trợ đăng nhập qua Google và GitHub.
-- **Gửi email tự động**: Sử dụng Nodemailer để gửi email thông báo.
 
 ## Công nghệ sử dụng
 
