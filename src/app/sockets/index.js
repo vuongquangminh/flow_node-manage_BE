@@ -13,17 +13,16 @@ const socketConfig = (server) => {
 
   const io = new Server(server, {
     cors: {
-      origin: ["http://localhost:5173", "https://cabaia.vercel.app/"], // Cho phép frontend React truy cập
+      origin: ["http://localhost:5173", "https://cabaia.vercel.app"], // Cho phép frontend React truy cập
 
       methods: ["GET", "POST"],
     },
   });
   io.on("connection", (socket) => {
     // Gửi một node mẫu từ server khi client connect
-    const user = socket.handshake.query.user;
-    socket.user = JSON.parse(user); // gán vào socket
+    // socket.user = JSON.parse(); // gán vào socket
 
-    chatSocket(io, socket);
+    // chatSocket(io, socket);
     chatBot(io, socket);
   });
 };
