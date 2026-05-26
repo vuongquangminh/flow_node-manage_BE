@@ -1,27 +1,20 @@
-const Product = require("../models/Product");
+const { prisma } = require("../config/db");
 
 class ProductController {
-  //GET: products
   async get(req, res, next) {
     try {
-      // Lấy page từ query, mặc định là 1
       const page = parseInt(req.query.page) || 1;
       const limit = 5;
       const skip = (page - 1) * limit;
+      const where = req.params.type_bag ? { type_bag: req.params.type_bag } : {};
 
-      const query = await Product.find(
-        req.params.type_bag ? { type_bag: req.params.type_bag } : {}
-      )
-        .sort({ createdAt: -1 }) // -1 là mới nhất
-        .skip(skip) // bỏ qua số phần tử đã lấy
-        .limit(limit);
-
-      const total = await Product.countDocuments(
-        req.params.type_bag ? { type_bag: req.params.type_bag } : {}
-      );
+      const [data, total] = await Promise.all([
+        prisma.product.findMany({ where, orderBy: { createdAt: "desc" }, take: limit, skip }),
+        prisma.product.count({ where }),
+      ]);
 
       res.json({
-        data: query,
+        data,
         message: "Lấy dữ liệu Product thành công!",
         total,
         currentPage: page,
@@ -31,61 +24,53 @@ class ProductController {
       next(err);
     }
   }
-  //GET DETAIL: product
-  async show(req, res) {
+
+  async show(req, res, next) {
     try {
-      const query = await Product.findOne({ _id: req.params.id });
+      const query = await prisma.product.findUnique({ where: { id: req.params.id } });
       res.json({ data: query, message: "Lấy dữ liệu chi tiết thành công" });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async search(req, res, next) {
+    try {
+      const query = await prisma.product.findMany({
+        where: { name: { contains: req.query.name, mode: "insensitive" } },
+        take: 4,
+      });
+      res.json({ data: query, message: "Lấy dữ liệu chi tiết thành công" });
+    } catch (err) {
       next(err);
     }
   }
 
-  //SEARCH
-  async search(req, res, next) {
-    try {
-      const query = await Product.find({
-        name: { $regex: ".*" + req.query.name + ".*" },
-      }).limit(4);
-      res.json({ data: query, message: "Lấy dữ liệu chi tiết thành công" });
-    } catch (err) {}
-  }
-
-  //POST: product
   async post(req, res, next) {
-    const data = await Product.create(req.body);
+    const data = await prisma.product.create({ data: req.body });
     if (data) {
       res.json({ message: "Bạn đã lưu dữ liệu Product thành công!", data });
     }
   }
 
   async edit(req, res, next) {
-    const data = await Product.updateOne({ _id: req.params.id }, req.body);
-    if (data) {
-      res.json({
-        message: "Bạn đã cập nhật dữ liệu Product thành công!",
-        data,
-      });
-    }
+    await prisma.product.update({ where: { id: req.params.id }, data: req.body });
+    res.json({ message: "Bạn đã cập nhật dữ liệu Product thành công!" });
   }
 
   async getAll(req, res, next) {
     try {
-      const query = await Product.find({});
+      const query = await prisma.product.findMany();
       res.json({ data: query, message: "Lấy dữ liệu product thành công" });
     } catch (err) {
       next(err);
     }
   }
+
   async delete(req, res, next) {
     try {
-      const result = await Product.deleteOne({
-        _id: req.params.id,
-      });
-      res.json({
-        data: result,
-        message: "Xóa dữ liệu Order thành công!",
-      });
+      const result = await prisma.product.delete({ where: { id: req.params.id } });
+      res.json({ data: result, message: "Xóa dữ liệu Product thành công!" });
     } catch (err) {
       next(err);
     }

@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String   @unique
+  password String?
+  friend   Int?
+  address  String?
+  phone    String?
+  status   Boolean?
+  role     String?
+  createAt DateTime @default(now())
+  upDateAt DateTime @updatedAt
+
+  @@map("accounts")
+}
+
+model Chat {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name_sent     String?
+  sender_id     String?
+  receiver_id   String?
+  name_receiver String?
+  message       String?
+  createAt      DateTime @default(now())
+  upDateAt      DateTime @updatedAt
+
+  @@map("chats")
+}
+
+model Friend {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id_user_1    String?
+  email_user_1 String?
+  name_user_1  String?
+  id_user_2    String
+  email_user_2 String
+  name_user_2  String
+  createAt     DateTime @default(now())
+  upDateAt     DateTime @updatedAt
+
+  @@map("friends")
+}
+
+type ProductColor {
+  id          Int
+  name        String
+  image_color String[]
+}
+
+type CompositionMaintenance {
+  title       String?
+  composition String[]
+  entretien   String[]
+}
+
+type SustainabilityItem {
+  logo        String?
+  title       String?
+  description String?
+}
+
+type SustainabilityGuarantee {
+  title       String?
+  description String?
+  item        SustainabilityItem[]
+}
+
+model Product {
+  id                       String                    @id @default(auto()) @map("_id") @db.ObjectId
+  name                     String?
+  price                    String?
+  image                    String?
+  type_bag                 String?
+  size                     String[]
+  color                    ProductColor[]
+  title                    String?
+  rate                     String?
+  sold                     String?
+  dimensions               String?
+  weight                   String?
+  feature                  String[]
+  composition_maintenance  CompositionMaintenance?
+  sustainability_guarantee SustainabilityGuarantee?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+
+  @@map("products")
+}
+
+type OrderProduct {
+  product_id   String
+  product_name String?
+  image        String?
+  price        String?
+  size         String?
+  color        String?
+  quantity     Int?
+}
+
+model Order {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  user_id   String?
+  user_name String?
+  products  OrderProduct[]
+  address   String?
+  phone     String?
+  code      String?
+  status    Int?           @default(0)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("orders")
+}

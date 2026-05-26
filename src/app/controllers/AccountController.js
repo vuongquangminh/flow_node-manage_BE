@@ -1,43 +1,39 @@
-const Account = require("../models/Account");
-const Friend = require("../models/Friend");
+const { prisma } = require("../config/db");
 
 class AccountController {
-  //GET: account
   async me(req, res, next) {
-    const query = await Account.findOne({ email: req.user.email });
-    res.json(query);
+    const account = await prisma.account.findUnique({ where: { email: req.user.email } });
+    res.json(account);
   }
+
   async get(req, res, next) {
-    const query = await Account.find({});
-    res.json(query);
+    const accounts = await prisma.account.findMany();
+    res.json(accounts);
   }
 
   async getById(req, res, next) {
-    const query = await Account.findOne({ _id: req.params.id });
-    res.json(query);
+    const account = await prisma.account.findUnique({ where: { id: req.params.id } });
+    res.json(account);
   }
+
   async create(req, res, next) {
-    const query = await Account.exists({ email: req.body.email });
-    if (query) {
+    const existing = await prisma.account.findUnique({ where: { email: req.body.email } });
+    if (existing) {
       return res.status(404).json({ error: "Email đã tồn tại" });
     }
-    const result = await Account.create(req.body);
-
+    const result = await prisma.account.create({ data: req.body });
     res.json(result);
   }
+
   async delete(req, res, next) {
     try {
-      const result = await Account.deleteOne({ _id: req.params.id });
-  
-      if (result.deletedCount === 0) {
+      await prisma.account.delete({ where: { id: req.params.id } });
+      res.json({ message: "Xoá user thành công" });
+    } catch (error) {
+      if (error.code === "P2025") {
         return res.status(404).json({ message: "Không tìm thấy user" });
       }
-  
-      res.json({
-        message: "Xoá user thành công",
-      });
-    } catch (error) {
-      next(error); // hoặc res.status(500).json({ error: error.message })
+      next(error);
     }
   }
 }

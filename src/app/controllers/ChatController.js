@@ -1,25 +1,25 @@
-const Chat = require("../models/Chat");
+const { prisma } = require("../config/db");
 
 class ChatController {
-  //GET: message
   async get(req, res, next) {
-    const query = await Chat.find({
-      $and: [
-        { $or: [{ sender_id: req.user.id }, { receiver_id: req.user.id }] },
-        {
-          $or: [
-            { sender_id: req.query.receiver_id },
-            { receiver_id: req.query.receiver_id },
-          ],
-        },
-      ],
-    })
-      .sort({ createAt: "desc" })
-      .limit(10);
+    const userId = String(req.user.id);
+    const receiverId = req.query.receiver_id;
+
+    const query = await prisma.chat.findMany({
+      where: {
+        AND: [
+          { OR: [{ sender_id: userId }, { receiver_id: userId }] },
+          { OR: [{ sender_id: receiverId }, { receiver_id: receiverId }] },
+        ],
+      },
+      orderBy: { createAt: "desc" },
+      take: 10,
+    });
     res.json(query.reverse());
   }
+
   async post(req, res, next) {
-    const data = await Chat.create(req.body);
+    const data = await prisma.chat.create({ data: req.body });
     if (data) {
       res.json({ data, message: "Bạn đã lưu dữ liệu Chat thành công" });
     }

@@ -1,50 +1,46 @@
 const bcrypt = require("bcrypt");
-const Account = require("../models/Account");
-class AuthController {
-  //POST: /login
-  async login(req, res, next) {
-    const dataReq = req.body;
-    const query = await Account.findOne({ email: dataReq.email });
+const jwt = require("jsonwebtoken");
+const { prisma } = require("../config/db");
+const { SECRET_ACCESS_TOKEN } = require("../config");
 
-    if (!query) {
+class AuthController {
+  async login(req, res, next) {
+    const { email, password } = req.body;
+    const account = await prisma.account.findUnique({ where: { email } });
+
+    if (!account) {
       return res.status(404).json({ error: "Không tìm thấy tài khoản" });
     }
 
-    const isPasswordValid = bcrypt.compareSync(
-      dataReq.password,
-      query.password
-    );
-    if (isPasswordValid) {
-      const token = query.generateAccessJWT();
-      return res.json({ user: query, token, message: "Đăng nhập thành công!" });
-    } else {
+    const isPasswordValid = bcrypt.compareSync(password, account.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Mật khẩu không đúng" });
     }
-    return res.status(401).json({ error: "Mật khẩu không đúng" });
+
+    const token = jwt.sign(
+      { id: account.id, email: account.email, name: account.name },
+      SECRET_ACCESS_TOKEN,
+      { expiresIn: "220m" }
+    );
+    return res.json({ user: account, token, message: "Đăng nhập thành công!" });
   }
 
-  // POST: create account to login
   async create(req, res, next) {
-    const { email } = req.body;
+    const { email, password, ...rest } = req.body;
     try {
-      const user = await Account.findOne({ email });
-
-      if (user) {
+      const existing = await prisma.account.findUnique({ where: { email } });
+      if (existing) {
         return res.status(401).json({ error: "Email đã tồn tại" });
-      } else {
-        const data = await Account.create(req.body);
-        return res.status(200).json({
-          data,
-          status: "success",
-          message: "Tạo tài khoản thành công",
-        });
       }
-    } catch (error) {
-      res.status(500).json({
-        status: error,
-        code: 500,
-        message: "Tạo tài khoản không thành công",
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const data = await prisma.account.create({
+        data: { email, password: hashedPassword, ...rest },
       });
+      return res.status(200).json({ data, status: "success", message: "Tạo tài khoản thành công" });
+    } catch (error) {
+      res.status(500).json({ status: error, code: 500, message: "Tạo tài khoản không thành công" });
     }
   }
 }
+
 module.exports = new AuthController();

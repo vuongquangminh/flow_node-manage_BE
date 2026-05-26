@@ -9,7 +9,6 @@ const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
 const dotenv = require("dotenv");
 const { google } = require("googleapis");
-const Account = require("../models/Account");
 
 dotenv.config();
 
@@ -115,19 +114,17 @@ function routeApp(app) {
         },
       }
     );
-    const query = await Account.findOne({ email: response.data.email });
+    const { prisma } = require("../config/db");
+    const query = await prisma.account.findUnique({ where: { email: response.data.email } });
     let newData = query;
 
     if (!query) {
-      // Nếu chưa có tài khoản, tạo mới
-      const newAccount = new Account({
-        email: response.data.email,
-        name: response.data.name,
+      newData = await prisma.account.create({
+        data: { email: response.data.email, name: response.data.name },
       });
-      newData = await newAccount.save();
     }
     const payload = {
-      id: newData._id,
+      id: newData.id,
       email: newData.email,
       name: newData.name,
     };
