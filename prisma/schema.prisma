@@ -97,7 +97,7 @@ model Product {
 }
 
 type OrderProduct {
-  product_id   String
+  product_id   Int
   product_name String?
   image        String?
   price        String?

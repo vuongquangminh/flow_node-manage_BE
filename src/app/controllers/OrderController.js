@@ -20,7 +20,7 @@ class OrderController {
 
     const dataProducts = await Promise.all(
       body.products.map(async (item) => {
-        const product = await prisma.product.findUnique({ where: { id: item.product_id } });
+        const product = await prisma.product.findUnique({ where: { id: parseInt(item.product_id) } });
         const image = product.color.filter((img) => img.name == item.color);
         return {
           product_id: product.id,
@@ -39,8 +39,8 @@ class OrderController {
         user_id: user.id,
         user_name: user.name,
         products: dataProducts,
-        address: body.address,
-        phone: body.phone,
+        address: body?.address,
+        phone: body?.phone,
         code: body.code,
         status: 0,
       },
