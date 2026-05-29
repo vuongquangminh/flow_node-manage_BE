@@ -27,7 +27,7 @@ class ProductController {
 
   async show(req, res, next) {
     try {
-      const query = await prisma.product.findUnique({ where: { id: req.params.id } });
+      const query = await prisma.product.findUnique({ where: { id: parseInt(req.params.id) } });
       res.json({ data: query, message: "Lấy dữ liệu chi tiết thành công" });
     } catch (error) {
       next(error);
@@ -47,14 +47,16 @@ class ProductController {
   }
 
   async post(req, res, next) {
-    const data = await prisma.product.create({ data: req.body });
+    const last = await prisma.product.findFirst({ orderBy: { id: "desc" } });
+    const nextId = last ? last.id + 1 : 1;
+    const data = await prisma.product.create({ data: { ...req.body, id: nextId } });
     if (data) {
       res.json({ message: "Bạn đã lưu dữ liệu Product thành công!", data });
     }
   }
 
   async edit(req, res, next) {
-    await prisma.product.update({ where: { id: req.params.id }, data: req.body });
+    await prisma.product.update({ where: { id: parseInt(req.params.id) }, data: req.body });
     res.json({ message: "Bạn đã cập nhật dữ liệu Product thành công!" });
   }
 
@@ -69,7 +71,7 @@ class ProductController {
 
   async delete(req, res, next) {
     try {
-      const result = await prisma.product.delete({ where: { id: req.params.id } });
+      const result = await prisma.product.delete({ where: { id: parseInt(req.params.id) } });
       res.json({ data: result, message: "Xóa dữ liệu Product thành công!" });
     } catch (err) {
       next(err);
