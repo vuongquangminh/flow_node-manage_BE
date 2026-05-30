@@ -4,6 +4,7 @@ const chatRoute = require("./chat");
 const orderRoute = require("./order");
 const friendRoute = require("./friend");
 const productRoute = require("./product");
+const paymentRoute = require("./payment");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
@@ -140,6 +141,7 @@ function routeApp(app) {
   app.use("/api", accountRoute);
   app.use("/api", productRoute);
   app.use("/api", authMiddleware, orderRoute);
+  app.use("/api", authMiddleware, paymentRoute);
   app.use("/api", authMiddleware, chatRoute);
   app.use("/api", authMiddleware, friendRoute);
 }

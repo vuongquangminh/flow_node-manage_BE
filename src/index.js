@@ -17,6 +17,11 @@ const server = http.createServer(app);
 app.use(cors());
 app.disable("x-powered-by");
 app.use(express.urlencoded({ extended: true }));
+
+// Webhook must be registered before express.json() to receive raw body for signature verification
+const webhookRoute = require("./app/routes/webhook");
+app.use("/api", webhookRoute);
+
 app.use(express.json());
 
 db.connect();
